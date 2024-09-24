@@ -1,0 +1,22 @@
+name: CI
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  docker_compose_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        working-directory: ./
+        run: npm install
+      - name: "Set up environment"
+        run: docker compose up -d --wait
+      - name: Run lint
+        working-directory: ./
+        run: npm run lint
+      - name: "Run tests"
+        working-directory: ./
+        run: npm run test

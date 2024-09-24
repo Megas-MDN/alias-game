@@ -1,0 +1,22 @@
+{
+  "name": "alias-game",
+  "version": "1.0.0",
+  "description": "## Overview",
+  "main": "index.js",
+  "scripts": {
+    "lint": "echo \"Go Lint\"",
+    "test": "echo \"Go test\"",
+    "start": "node --env-file .env src/index.js",
+    "dev": "node --env-file .env --watch src/index.js",
+    "dc:up": "docker compose up -d && docker compose logs -f api",
+    "dc:down": "docker compose down --remove-orphans"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.6.3"
+  }
+}
