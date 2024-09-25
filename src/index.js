@@ -15,9 +15,7 @@ app.get("/", async (req, res) => {
 });
 
 mongoose
-  .connect("mongodb://mongo:27017/aliasgame", {
-    useNewUrlParser: true,
-  })
+  .connect("mongodb://mongo:27017/aliasgame", {})
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error(err));
 
