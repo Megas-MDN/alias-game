@@ -32,7 +32,7 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     env_file:
-      - .env.exemple
+      - .env
     links:
       - database
     networks:

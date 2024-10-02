@@ -1,6 +1,5 @@
 .vscode
 node_modules/
 temp/
-.env
 coverage/
 yarn.lock
