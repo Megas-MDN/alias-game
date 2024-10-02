@@ -15,7 +15,7 @@
     "dc:stop": "docker compose stop",
     "dc:up:actions": "dotenv -e .env.exemple -- docker compose up -d",
     "prisma:generate:actions": "dotenv -e .env.exemple -- npx prisma generate",
-    "setup:prisma:actions": "dotenv -e .env.exemple -- prisma generate && npx prisma db push",
+    "setup:prisma:actions": "prisma generate && npx prisma db push",
     "setup:prisma": "prisma generate && npx prisma db push",
     "prisma:studio": "npx prisma studio",
     "lint": "npx eslint ."
