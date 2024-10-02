@@ -33,8 +33,6 @@ services:
       - /usr/src/app/node_modules
     env_file:
       - .env.exemple
-    environment:
-      - DATABASE_URL=mongodb://mongo:docker@localhost:27017/aliasgame?directConnection=true&authSource=admin
     links:
       - database
     networks:
