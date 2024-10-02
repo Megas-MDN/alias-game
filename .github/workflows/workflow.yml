@@ -31,12 +31,12 @@ jobs:
         run: npm run lint
 
       - name: Run Prisma Generate
-        run: npx prisma generate
+        run: npm run prisma:generate:actions
 
       - name: "Set up Docker"
         run: npm run dc:up:actions
 
       - name: "Set up Prisma"
-        run: npm run setup:prisma
+        run: npm run setup:prisma:actions
 
         

@@ -7,19 +7,22 @@
   "license": "ISC",
   "type": "module",
   "scripts": {
-    "dev": "node --watch --env-file=.env.exemple src/server.js",
+    "dev": "node --watch --env-file=.env src/server.js",
     "dev:debug": "node --inspect --env-file=.env src/server.js",
     "dc:up": "docker compose up -d && docker compose logs -f app",
     "dc:down": "docker compose down --remove-orphans",
     "dc:start": "docker compose start",
     "dc:stop": "docker compose stop",
-    "dc:up:actions": "docker compose up -d",
-    "setup:prisma": "yarn prisma generate && npx prisma db push",
+    "dc:up:actions": "dotenv -e .env.exemple -- docker compose up -d",
+    "prisma:generate:actions": "dotenv -e .env.exemple -- npx prisma generate",
+    "setup:prisma:actions": "dotenv -e .env.exemple -- prisma generate && npx prisma db push",
+    "setup:prisma": "prisma generate && npx prisma db push",
     "prisma:studio": "npx prisma studio",
     "lint": "npx eslint ."
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv-cli": "^7.4.2",
     "express": "^4.21.0",
     "express-async-errors": "^3.1.1",
     "prisma": "^5.20.0"
