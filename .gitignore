@@ -3,4 +3,6 @@ node_modules/
 temp/
 coverage/
 yarn.lock
+package-lock
 .env
+up
