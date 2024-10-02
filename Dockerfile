@@ -1,14 +1,14 @@
-FROM node:20.15.1-alpine3.19
+FROM node:20.15.0
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
+COPY prisma ./prisma/ 
+
+RUN npm install 
 
 COPY . .
 
-ENV NODE_ENV=production
-ENV PORT=3001
+EXPOSE 8080
 
-EXPOSE 3001
-
-ENTRYPOINT ["sh", "-c", "npm install && if [ \"$NODE_ENV\" = 'development' ]; then npm run dev; else npm start; fi"]
+CMD ["npm","run","dev"]
