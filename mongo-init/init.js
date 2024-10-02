@@ -1,15 +1,16 @@
-db = db.getSiblingDB("aliasgame");
+const mongoose = require('mongoose');
 
-db.createCollection("users");
-db.users.insertMany([
-  {
-    username: "player1",
-    password: "e234dsdom3k2kmdl3l43iwes9vjro44223m3n32kn5n2ksdo4",
-  }, // password123
-  {
-    username: "player2",
-    password: "e234dsdom3k2kmdl3l43iwes9vjro44223m3n32kn5n2ksdo4",
-  }, // password123
-]);
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log('MongoDB connected...');
+    } catch (err) {
+        console.error(err.message);
+        process.exit(1); // Exit process with failure
+    }
+};
 
-db.createCollection("games");
+module.exports = connectDB;

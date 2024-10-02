@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
+RUN npm install
+
 COPY . .
 
 ENV NODE_ENV=production
@@ -11,4 +13,4 @@ ENV PORT=3001
 
 EXPOSE 3001
 
-ENTRYPOINT ["sh", "-c", "npm install && if [ \"$NODE_ENV\" = 'development' ]; then npm run dev; else npm start; fi"]
+CMD ["npm", "run", "dev"]
