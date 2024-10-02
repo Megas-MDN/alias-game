@@ -9,12 +9,6 @@ export const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (request, response) => {
-  return response.status(200).json({
-    status: "success",
-    message: "Hello World",
-  });
-});
 app.use(usersRoutes);
 
 app.use((error, request, response, next) => {
