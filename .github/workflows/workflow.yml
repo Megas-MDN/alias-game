@@ -1,22 +1,42 @@
-name: CI
+name: Continuous integration
+
 on:
   push:
+    paths:
+      - "**.js"
+      - "**.json"
+      - "**.yml"
     branches: ["main"]
   pull_request:
     branches: ["main"]
+
+  workflow_dispatch:
+  
 jobs:
-  docker_compose_and_test:
+  app:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies
-        working-directory: ./
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.15.0
+        
+      - name: Install Dependencies
         run: npm install
-      - name: "Set up environment"
-        run: docker compose up -d --wait
-      - name: Run lint
-        working-directory: ./
+      
+      - name: Run ESLint
         run: npm run lint
-      - name: "Run tests"
-        working-directory: ./
-        run: npm run test
+
+      - name: Run Prisma Generate
+        run: npx prisma generate
+
+      - name: "Set up Docker"
+        run: npm run dc:up:actions
+
+      - name: "Set up Prisma"
+        run: npm run setup:prisma
+
+        
