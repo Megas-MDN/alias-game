@@ -13,6 +13,7 @@
     "dc:down": "docker compose down --remove-orphans",
     "dc:start": "docker compose start",
     "dc:stop": "docker compose stop",
+    "dc:up:actions": "docker compose up -d",
     "setup:prisma": "yarn prisma generate && npx prisma db push",
     "prisma:studio": "npx prisma studio",
     "lint": "npx eslint ."
