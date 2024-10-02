@@ -3,4 +3,10 @@ node_modules/
 temp/
 coverage/
 yarn.lock
+<<<<<<< HEAD
 .env
+=======
+package-lock
+.env
+up
+>>>>>>> main
