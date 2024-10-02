@@ -30,8 +30,8 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-      - name: "Set up environment"
-        run: docker compose up -d --wait
+      - name: "Set up Docker"
+        run: npm run dc:up
 
       - name: "Set up Prisma"
         run: npm run setup:prisma
