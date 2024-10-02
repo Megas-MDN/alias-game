@@ -30,6 +30,9 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
+      - name: Run Prisma Generate
+        run: npx prisma generate
+
       - name: "Set up Docker"
         run: npm run dc:up:actions
 
