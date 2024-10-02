@@ -9,19 +9,22 @@ export const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get("/", (request, response) => {
+  return response.status(200).json({
+    status: "success",
+    message: "Hello World",
+  });
+});
 app.use(usersRoutes);
 
 app.use((error, request, response, next) => {
+  if (error instanceof AppError) {
+    next;
+    return response.status(error.statusCode).json({ message: error.message });
+  }
 
-    if(error instanceof AppError) {
-        next;
-        return response.status(error.statusCode).json({ message: error.message });
-    }
-
-    return response.status(500).json({
-        status: "error",
-        message: `Internal Server Error ${error.message}`
-    });
-
+  return response.status(500).json({
+    status: "error",
+    message: `Internal Server Error ${error.message}`,
+  });
 });
-
