@@ -1,7 +1,4 @@
-.vscode
 node_modules/
 temp/
-coverage/
-yarn.lock
 .env
-
+coverage/
