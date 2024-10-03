@@ -2,12 +2,13 @@ import express from "express";
 import cors from "cors";
 import "express-async-errors";
 import { AppError } from "./error/appError.js";
+import { routerMessages } from "./routes/chatRoutes.js";
 
 export const app = express();
 
 app.use(express.json());
 app.use(cors());
-
+app.use("/chats", routerMessages);
 
 app.use((error, request, response, next) => {
   if (error instanceof AppError) {
