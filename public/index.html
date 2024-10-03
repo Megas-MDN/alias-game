@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alias Game - Client</title>
     <script src="/socket.io/socket.io.js"></script>
+
 </head>
 <body>
     <h1>Alias Game</h1>
@@ -16,23 +17,29 @@
     <script>
         const socket = io('http://localhost:3001');
 
-        //send message
-        document.getElementById('sendButton').onclick = () => {
+        const userId = 'userId123'; //here should be the user ID
+
+        //join to a room when connected
+        //socket.emit('joinRoom', userId);
+
+         //Send message to the server
+         document.getElementById('sendButton').onclick = () => {
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value;
             const userId = 'userId123'; 
 
             socket.emit('sendMessage', { message, userId });
-            messageInput.value = ''; 
+            messageInput.value = ''; //Clean the input
         };
 
-        //listen for messages
+        //listen for messages from the server
         socket.on('receiveMessage', (data) => {
             const messagesList = document.getElementById('messages');
             const newMessage = document.createElement('li');
             newMessage.textContent = `Message from ${data.userId}: ${data.message}`;
             messagesList.appendChild(newMessage);
         });
+
     </script>
     
 </body>
