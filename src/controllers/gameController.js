@@ -54,6 +54,7 @@ const joinGame = async (req, res) => {
     }
 };
 
+//to see the game information
 const getGameById = async (req, res) => {
     const { gameId } = req.params;
 
@@ -79,37 +80,68 @@ const getGameById = async (req, res) => {
         console.error('Error fetching game:', error);
         res.status(500).json({ message: 'Error fetching game' });
     }
-}
+};
 
-//Testing the nextTurn function
+const endTurn = async (req, res) => {
+    try {
+        const { gameId } = req.params;
+        const game = await nextTurn(gameId); //function to change the turn
+        res.json({ message: 'Turn ended, next team\'s turn', game });
+    } catch (error) {
+        res.status(500).json({ message: 'Error ending turn' });
+    }
+};
 
-/*const async function nextTurn(gameId) {
+async function nextTurn(gameId) {
+
+    //find the game by its ID
     const game = await Game.findById(gameId);
 
-    if (!game) throw new Error('Game not found');
-
-    //change game turn
-    const team1 = game.teams[0];
-    const team2 = game.teams[1];
-
-    if (game.currentTurnTeamId.toString() === team1.toString()) {
-        game.currentTurnTeamId = team2; 
-    } else {
-        game.currentTurnTeamId = team1;
-        game.currentRound++; // only change round when both teams have played
+    //if the game does not exist
+    if (!game) {
+        return res.status(404).json({ message: 'Game not found' });
     }
 
-    if (game.currentRound > game.rounds) {
-        game.status = 'completed'; // if the game has reached the last round, set status to completed
-    }
+    //check if the game is in progress
+    if(game.status === 'in progress'){
 
-    await game.save();
-    return game;
-}*/
+        const team1 = game.teams[0];
+        const team2 = game.teams[1];
+
+        if (game.currentTurnTeamId.toString() === team1.toString()) {
+            game.currentTurnTeamId = team2; 
+
+            //aca deberia hacer el cambio del currentDescriber, y la palabra to guess
+        } else {
+            game.currentTurnTeamId = team1;
+            game.currentRound++; //if both teams played, increase the round
+
+            //aca se deberia hacer el cambio del currentDescriber y la palabra to guess
+        }
+
+        if (game.currentRound > game.rounds) {
+            game.status = 'completed'; //if they played all rounds, the game is completed
+
+            // TO DO - when the game is completed 
+            // 1) check which team is the winner --> with team score
+            // 2) update the user's current game and team
+            // 3) update the user's gamesPlayed and gamesWon
+        }
+
+        await game.save();
+        return game;
+        
+    }else{
+        return res.status(404).json({ message: 'Game status waiting or finished' });
+    }
+    
+}
+
 
 module.exports = {
      joinGame,
      getGameById,
+     endTurn
 };
 
 
