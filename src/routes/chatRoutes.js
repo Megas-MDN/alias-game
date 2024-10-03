@@ -1,6 +1,8 @@
-import { Router } from "express";
-import * as chatController from "../controllers/chatController.js";
+const { Router } = require("express");
+const controller = require("../controllers/chatController");
 
-export const routerMessages = Router();
+const router = Router();
 
-routerMessages.get("/", chatController.listAllChats);
+router.get("/", controller.listAllChats);
+
+module.exports = router;
