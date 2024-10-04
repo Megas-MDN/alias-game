@@ -28,8 +28,7 @@ const updateChat = async (chatId, data = {}) => {
   if (!chat) {
     return null;
   }
-
-  if (chat.userId !== data.userId) {
+  if (chat.userId.toString() !== data.userId) {
     return null;
   }
 
@@ -37,15 +36,14 @@ const updateChat = async (chatId, data = {}) => {
   chat.teamId = data.teamId || chat.teamId;
   chat.message = data.message || chat.message;
   chat.messageType = data.messageType || chat.messageType;
-  return chat.save();
+  await chat.save();
+
+  return chat;
 };
 
 const deleteChat = async (chatId) => {
-  const chat = await ChatModel.findById(chatId);
-  if (!chat) {
-    return null;
-  }
-  return chat.remove();
+  const chat = await ChatModel.findByIdAndDelete(chatId);
+  return chat;
 };
 
 const createChat = async (data = {}) => {
