@@ -29,6 +29,14 @@ const joinGame = async (req, res) => {
 
         //get the teams of the game
         const teams = await Team.find({ _id: { $in: game.teams } });
+        
+        //check if the player is already in a team
+        const isPlayerInTeam = teams.some(team => team.players.includes(userId));
+        if (isPlayerInTeam) {
+            return res.status(400).json({ message: 'Player is already in a team' });
+        }
+
+        //join the player to the team with less players
         const teamToJoin = teams[0].players.length <= teams[1].players.length ? teams[0] : teams[1];
 
         //add the user to the team
@@ -204,12 +212,32 @@ async function playGame(req, res) {
         return res.status(500).json({ message: 'Internal server error' });
     }
 }
-        
+
+
+//function to delete a game
+const deleteGameById = async (req, res) => {
+    const { gameId } = req.params;
+
+    try {
+        const deletedGame = await Game.findByIdAndDelete(gameId);
+
+        if (!deletedGame) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+
+        return res.status(200).json({ message: 'Game deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting game:', error);
+        return res.status(500).json({ error: 'Failed to delete game' });
+    }
+};
+
 
 
 module.exports = {
      joinGame,
      getGameById,
+     deleteGameById,
      endTurn,
      playGame
 };
