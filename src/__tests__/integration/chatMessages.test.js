@@ -1,16 +1,11 @@
 const app = require("../../app");
 const supertest = require("supertest");
 const { signToken } = require("../../utils/jwt");
-require("dotenv").config();
 
 jest.mock("../../models/chatModel");
 
 const ChatModel = require("../../models/chatModel");
 const BASE_PATH = "/api/chats";
-
-beforeAll(() => {
-  process.env.JWT_SECRET = "yourSecret";
-});
 
 const token = signToken(
   { id: "66fedbcd52619e12028fb7b7", username: "Megas" },
