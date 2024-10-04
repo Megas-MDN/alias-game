@@ -102,7 +102,7 @@ const endTurn = async (req, res) => {
         } else {
             res.json({ message: 'Turn ended, next team\'s turn', game });
         }
-    } catch (error) {
+    } catch {
         res.status(500).json({ message: 'Error ending turn' });
     }
 };
@@ -145,8 +145,8 @@ async function nextTurn(gameId) {
             game.currentDescriber = getNextDescriber(currentTeam);
 
             // Get a new word for the current round
-            game.currentWord = getNewWord();  // !!! here goes the logic to get a random word    
-            game.similarWords = getSimilarWords(game.currentWord); // !!! here goes the logic to get similar words
+            //game.currentWord = getNewWord();  // !!! here goes the logic to get a random word    
+            //game.similarWords = getSimilarWords(game.currentWord); // !!! here goes the logic to get similar words
         }
 
         await game.save();
