@@ -91,7 +91,7 @@ const getGameById = async (req, res) => {
     }
 };
 
-//to end the turn
+//to end the turn - in progress
 const endTurn = async (req, res) => {
     try {
         const { gameId } = req.params;
@@ -164,7 +164,7 @@ function getNextDescriber(team) {
 }
 
 
-// Fuction to manage the game - IN PROGRESS
+// Fuction to manage the game - IN PROGRESS ! :)
 async function playGame(req, res) {
     const { gameId } = req.body; //recieve the game ID from the request body
     const { io } = req.app.get('socketio'); //get the socket.io instance
