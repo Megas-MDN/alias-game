@@ -29,11 +29,11 @@ const gameSchema = new mongoose.Schema({
         ref: 'User', 
         required: true, 
     },
-    currentWord: {
+    currentWord: { //coffee 
         type: String,
         required: true, 
-    },
-    similarWords: [{
+    }, 
+    similarWords: [{ //[ tea, milk, sugar ] //library similar words
         type: String,
     }],
     correctGuesses: {

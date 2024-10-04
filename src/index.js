@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
 const http = require("http");
 const socketSetup = require("../src/sockets/socket");
+
 const PORT = process.env.PORT || 3001;
 const MONGO_URI = process.env.MONGO_URI;
 const app = require("../src/app");
+
 
 // Connect MongoDB
 mongoose
