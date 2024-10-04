@@ -1,6 +1,7 @@
 const app = require("../../app");
 const supertest = require("supertest");
 const { signToken } = require("../../utils/jwt");
+require("dotenv").config();
 
 jest.mock("../../models/chatModel");
 
