@@ -1,29 +1,38 @@
-import { prismaService } from "../utils/prismaService.js";
+const mongoose = require('mongoose');
 
-export const listAllChats = async (
-  query = {
-    gameId: "",
-    teamId: "",
-    userId: "",
-    type: "",
-    search: "",
-    order: 1,
-  },
-) => {
-  return await prismaService.chat.findMany({
-    where: {
-      gameId: query.gameId,
-      teamId: query.teamId,
-      userId: query.userId,
-      messageType: {
-        contains: query.type,
-      },
-      message: {
-        contains: query.search,
-      },
+const chatSchema = new mongoose.Schema({
+    gameId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Game', 
+        required: true,
     },
-    orderBy: {
-      createdAt: query.order === 1 ? "desc" : "asc",
+    teamId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team', 
+        required: true,
     },
-  });
-};
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true, 
+    },
+    message: {
+        type: String,
+        required: true, 
+    },
+    messageType: {
+        type: String,
+        enum: ['description', 'guess'], 
+        required: true,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now, 
+    },
+}, {
+    timestamps: true, 
+});
+
+const Chat = mongoose.model('Chat', chatSchema);
+
+module.exports = Chat;
