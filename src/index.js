@@ -7,6 +7,11 @@ const gameRoutes = require('../src/routes/gameRoutes');
 const http = require('http');
 const socketSetup = require('../src/sockets/socket');
 
+// Swagger
+const swaggerUi = require('swagger-ui-express'); 
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./src/utils/swagger.yaml');
+
 const app = express(); 
 const PORT = process.env.PORT || 3001;
 const MONGO_URI = process.env.MONGO_URI;
@@ -18,6 +23,9 @@ app.use(bodyParser.json());
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
+
+// Swagger route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Connect MongoDB
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
