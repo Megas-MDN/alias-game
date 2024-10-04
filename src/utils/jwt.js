@@ -1,20 +1,27 @@
-const dotenv = require('dotenv');
-const crypto = require('crypto');
+const dotenv = require("dotenv");
+const crypto = require("crypto");
 
 dotenv.config();
 
-const SECRET = process.env.JWT_SECRET;
+const SECRET = process.env.JWT_SECRET || "yourSecret";
 
 const signToken = (payload) => {
   const header = {
-    alg: 'HS256',
-    typ: 'JWT'
+    alg: "HS256",
+    typ: "JWT",
   };
 
-  const headerBase64Url = encodeBase64Url(Buffer.from(JSON.stringify(header)).toString('base64'));
-  const payloadBase64Url = encodeBase64Url(Buffer.from(JSON.stringify(payload)).toString('base64'));
+  const headerBase64Url = encodeBase64Url(
+    Buffer.from(JSON.stringify(header)).toString("base64"),
+  );
+  const payloadBase64Url = encodeBase64Url(
+    Buffer.from(JSON.stringify(payload)).toString("base64"),
+  );
 
-  const signature = createHmacSHA256Signature(headerBase64Url, payloadBase64Url);
+  const signature = createHmacSHA256Signature(
+    headerBase64Url,
+    payloadBase64Url,
+  );
 
   const jwt = `${headerBase64Url}.${payloadBase64Url}.${signature}`;
   console.log(jwt);
@@ -24,28 +31,33 @@ const signToken = (payload) => {
 
 function createHmacSHA256Signature(headerBase64Url, payloadBase64Url) {
   const signatureInput = `${headerBase64Url}.${payloadBase64Url}`;
-  const hmac = crypto.createHmac('sha256', SECRET);
+  const hmac = crypto.createHmac("sha256", SECRET);
   hmac.update(signatureInput);
-  return encodeBase64Url(hmac.digest('base64'));
+  return encodeBase64Url(hmac.digest("base64"));
 }
 
 function encodeBase64Url(str) {
-  return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return str.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
 
 const verifyToken = (token) => {
-  const [headerBase64, payloadBase64, providedSignature] = token.split('.');
+  const [headerBase64, payloadBase64, providedSignature] = token.split(".");
 
-  const expectedSignature = createHmacSHA256Signature(headerBase64, payloadBase64);
+  const expectedSignature = createHmacSHA256Signature(
+    headerBase64,
+    payloadBase64,
+  );
 
   if (providedSignature !== expectedSignature) {
-    throw new Error('Token signature verification failed');
+    throw new Error("Token signature verification failed");
   }
 
-  const payload = JSON.parse(Buffer.from(payloadBase64, 'base64url').toString());
+  const payload = JSON.parse(
+    Buffer.from(payloadBase64, "base64url").toString(),
+  );
 
   if (payload.exp && payload.exp < Date.now() / 1000) {
-    throw new Error('Token expired');
+    throw new Error("Token expired");
   }
 
   return payload;
