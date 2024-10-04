@@ -17,7 +17,6 @@ const signToken = (payload) => {
   const signature = createHmacSHA256Signature(headerBase64Url, payloadBase64Url);
 
   const jwt = `${headerBase64Url}.${payloadBase64Url}.${signature}`;
-  console.log(jwt);
 
   return jwt;
 };

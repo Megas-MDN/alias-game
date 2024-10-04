@@ -2,6 +2,7 @@ const Game = require('../models/gameModel');
 const Team = require('../models/teamModel'); 
 const User = require('../models/userModel');
 
+//join a game
 const joinGame = async (req, res) => {
     const { userId } = req.body; 
 
@@ -82,11 +83,17 @@ const getGameById = async (req, res) => {
     }
 };
 
+//to end the turn
 const endTurn = async (req, res) => {
     try {
         const { gameId } = req.params;
         const game = await nextTurn(gameId); //function to change the turn
-        res.json({ message: 'Turn ended, next team\'s turn', game });
+
+        if (game.status === 'completed') {
+            res.json({ message: 'Game completed', game });
+        } else {
+            res.json({ message: 'Turn ended, next team\'s turn', game });
+        }
     } catch (error) {
         res.status(500).json({ message: 'Error ending turn' });
     }
@@ -99,7 +106,7 @@ async function nextTurn(gameId) {
 
     //if the game does not exist
     if (!game) {
-        return res.status(404).json({ message: 'Game not found' });
+        throw new Error('Game not found');
     }
 
     //check if the game is in progress
@@ -109,39 +116,102 @@ async function nextTurn(gameId) {
         const team2 = game.teams[1];
 
         if (game.currentTurnTeamId.toString() === team1.toString()) {
-            game.currentTurnTeamId = team2; 
-
-            //aca deberia hacer el cambio del currentDescriber, y la palabra to guess
+            game.currentTurnTeamId = team2; //change the turn to the other team
         } else {
             game.currentTurnTeamId = team1;
             game.currentRound++; //if both teams played, increase the round
-
-            //aca se deberia hacer el cambio del currentDescriber y la palabra to guess
         }
 
+        //if they played all rounds, the game is completed
         if (game.currentRound > game.rounds) {
-            game.status = 'completed'; //if they played all rounds, the game is completed
+            game.status = 'completed'; 
 
-            // TO DO - when the game is completed 
+            // TO DO - ADD LOGIC TO DETERMINE THE WINNER
             // 1) check which team is the winner --> with team score
             // 2) update the user's current game and team
             // 3) update the user's gamesPlayed and gamesWon
+
+        }else{
+            // Update describer for the current team
+            const currentTeam = await Game.findById(game.currentTurnTeamId);
+            game.currentDescriber = getNextDescriber(currentTeam);
+
+            // Get a new word for the current round
+            game.currentWord = getNewWord();  // !!! here goes the logic to get a random word    
+            game.similarWords = getSimilarWords(game.currentWord); // !!! here goes the logic to get similar words
         }
 
         await game.save();
         return game;
         
     }else{
-        return res.status(404).json({ message: 'Game status waiting or finished' });
-    }
-    
+        throw new Error('Game is not in progress or already finished');
+    }   
 }
+
+function getNextDescriber(team) {
+    const describerIndex = team.players.indexOf(team.currentDescriber);
+    const nextIndex = (describerIndex + 1) % team.players.length;
+    return team.players[nextIndex];
+}
+
+
+// Fuction to manage the game - IN PROGRESS
+async function playGame(req, res) {
+    const { gameId } = req.body; //recieve the game ID from the request body
+    const { io } = req.app.get('socketio'); //get the socket.io instance
+
+    try {
+        const game = await Game.findById(gameId).populate('teams currentTurnTeamId');
+        
+        if (!game || game.status !== 'in progress') {
+            return res.status(404).json({ message: 'Game not found or not in progress' });
+        }
+
+        // Emit the gameStart event to all players in the game
+        io.to(gameId).emit('gameStart', { message: 'Game has started!', game });
+
+        while (game.status === 'in progress') {
+            // Emit the yourTurn event to the current team
+            io.to(game.currentTurnTeamId.toString()).emit('yourTurn', {
+                currentDescriber: game.currentDescriber,
+                wordToGuess: game.currentWord,
+            });
+
+            // Wait for the turn to end - 60 seconds 
+            await new Promise(resolve => setTimeout(resolve, 60000)); 
+
+            // Finish the turn and get the updated game
+            const updatedGame = await nextTurn(game._id);
+
+            // emit the turnEnd event to all players in the game
+            io.to(gameId).emit('turnEnd', {
+                message: `Turn ended. Next team's turn`,
+                nextTeamId: updatedGame.currentTurnTeamId,
+            });
+
+            // If the game is completed, emit the gameEnd event
+            if (updatedGame.status === 'completed') {
+                io.to(gameId).emit('gameEnd', { message: 'Game over!', updatedGame });
+                break;
+            }
+        }
+
+        return res.status(200).json({ message: 'Game is in progress', game });
+
+    } catch (error) {
+        console.error('Error in playGame:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+        
 
 
 module.exports = {
      joinGame,
      getGameById,
-     endTurn
+     endTurn,
+     playGame
 };
 
 
