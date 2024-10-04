@@ -1,6 +1,6 @@
-import { Server } from "socket.io";
+const { Server } = require("socket.io");
 
-export const socket = (server) => {
+module.exports = (server) => {
   const io = new Server(server);
 
   io.on("connection", (socket) => {
