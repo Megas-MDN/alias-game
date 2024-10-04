@@ -129,8 +129,7 @@ describe("Chat messages", () => {
         messageType: "guess",
       });
 
-    const { save, ...responseMocked } = response.body;
-    expect(responseMocked).toEqual(mockChat);
+    expect(response.body).toEqual(mockChat);
     expect(response.status).toBe(200);
   });
 
