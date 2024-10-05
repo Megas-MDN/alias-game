@@ -24,7 +24,6 @@ const signToken = (payload) => {
   );
 
   const jwt = `${headerBase64Url}.${payloadBase64Url}.${signature}`;
-  console.log(jwt);
 
   return jwt;
 };
