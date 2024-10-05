@@ -9,6 +9,7 @@ const swaggerDocument = YAML.load('./src/utils/swagger.yaml');
 const userRoutes = require("../src/routes/authRoutes");
 const gameRoutes = require("../src/routes/gameRoutes");
 const chatRoutes = require("../src/routes/chatRoutes");
+const teamRoutes = require("../src/routes/teamRoutes");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(bodyParser.json());
 app.use("/api/users", userRoutes);
 app.use("/api/games", gameRoutes);
 app.use("/api/chats", chatRoutes);
+app.use("/api/teams", teamRoutes);
 
 // Swagger route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

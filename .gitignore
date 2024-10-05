@@ -2,4 +2,6 @@ node_modules/
 temp/
 .env
 coverage/
-
+package-lock.json
+yarn.lock
+.vscode
