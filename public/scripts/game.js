@@ -6,6 +6,10 @@ const socket = io("/");
 let user = null;
 let game = null;
 
+document.getElementById("backBtn").onclick = () => {
+  window.location.href = "/";
+};
+
 const clearAll = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("game");
@@ -54,7 +58,7 @@ document
     }
   });
 
-socket.on("receiveMessage", (data) => {
+const createNewLine = (data) => {
   const newMessage = document.createElement("li");
   newMessage.classList.add("text-gray-700");
   newMessage.innerHTML = `<strong>${data.username || data.userId}:</strong> ${
@@ -63,16 +67,41 @@ socket.on("receiveMessage", (data) => {
   messagesList.appendChild(newMessage);
 
   messagesList.scrollTop = messagesList.scrollHeight;
+};
+
+socket.on("receiveMessage", (data) => {
+  if (data.gameId === game.gameId && data.teamId === game.teamId) {
+    createNewLine(data);
+  }
 });
+
+const fetchGameMessages = async (gameId, teamId) => {
+  const response = await fetch(`/api/chats?gameId=${gameId}&teamId=${teamId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem("token"))}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+};
 
 window.onload = () => {
   user = getUserFromLocalStorage();
   game = getGameFromLocalStorage();
-  console.log(user, "><<<");
-  console.log(game, "><<<");
   if (!user || !game) {
     clearAll();
     window.location.replace("/login.html");
   }
   playerName.textContent = user.username;
+  fetchGameMessages(game.gameId, game.teamId).then((data) => {
+    (data || []).forEach((chat) => {
+      createNewLine({
+        ...chat,
+        username: chat?.userId.username,
+        userId: chat?.userId._id,
+      });
+    });
+  });
 };

@@ -15,8 +15,23 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col items-center">
   <!-- Header -->
-  <header class="w-full bg-white shadow p-4 flex justify-between items-center position-fixed top-0">
-    <h1 class="text-2xl font-bold">Alias Game</h1>
+  <header class="w-full bg-white shadow p-4 flex justify-between items-center">
+    <div class="flex items-center space-x-4">
+      <button id="backBtn"
+        class="flex items-center bg-gray-500 text-white px-2 py-2 rounded-md hover:bg-gray-600 transition duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 ml-1"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 12H3m0 0l6-6m-6 6l6 6" />
+        </svg>
+      </button>
+      <h1 class="text-2xl font-bold">Alias Game</h1>
+    </div>
     <div class="flex items-center space-x-4">
       <span class="text-lg"
         id="playerName"></span>
