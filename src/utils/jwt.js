@@ -55,10 +55,6 @@ const verifyToken = (token) => {
     Buffer.from(payloadBase64, "base64url").toString(),
   );
 
-  if (payload.exp && payload.exp < Date.now() / 1000) {
-    throw new Error("Token expired");
-  }
-
   return payload;
 };
 
