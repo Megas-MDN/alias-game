@@ -6,7 +6,30 @@ info:
 servers:
   - url: http://localhost:3001/api
 paths:
-  /login:
+  /users/register:
+    post:
+      summary: User registration
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: User registered
+        '400':
+          description: User already exists
+        '500':
+          description: Internal server error
+  /users/login: 
     post:
       summary: User login
       tags:
@@ -24,6 +47,112 @@ paths:
                   type: string
       responses:
         '200':
-          description: Successful login
-        '401':
-          description: Unauthorized
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Logged in
+                  token:
+                    type: string
+                    description: JWT token
+        '400':
+          description: Invalid credentials
+        '500':
+          description: Internal server error
+  /games/{gameId}:
+    get:
+      summary: Get game by ID
+      tags:
+        - Game
+      parameters:
+        - in: path
+          name: gameId 
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The game ID to get
+      responses:
+        '200':
+          description: Game found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    teams:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          teamName:
+                            type: string
+                          players:
+                            type: array
+                            items:
+                              type: string
+                          score:
+                            type: integer
+                          createdAt:
+                            type: string
+                            format: date-time
+                          updatedAt:
+                            type: string
+                            format: date-time
+                          __v:
+                            type: integer
+                    rounds:
+                      type: integer
+                    currentRound:
+                      type: integer
+                    status:
+                      type: string
+                    currentTurnTeam:
+                      type: string
+                    currentDescriber:
+                      type: string
+                    currentWord:
+                      type: string
+                    similarWords:
+                      type: array
+                      items:
+                        type: string
+                    correctGuesses:
+                      type: integer
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+                    __v:
+                      type: integer
+        '404':
+          description: Game not found
+        '500':
+          description: Internal server error - Error fetching game   
+      
+    delete:
+      summary: Delete game by ID
+      tags:
+        - Game
+      parameters:
+        - in: path
+          name: gameId 
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The game ID to delete
+  /games/join:   
+  /games/play:      
