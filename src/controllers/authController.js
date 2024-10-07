@@ -56,4 +56,16 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const findUserById = async (id) => {
+  try {
+    return await User.findById(id);
+  } catch (error) {
+    throw new Error("Database error: " + error.message);
+  }
+};
+
+module.exports = { 
+  registerUser, 
+  loginUser, 
+  findUserById
+};
