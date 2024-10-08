@@ -3,8 +3,11 @@ const supertest = require("supertest");
 const { signToken } = require("../../utils/jwt");
 
 jest.mock("../../models/chatModel");
+jest.mock("../../models/userModel");
 
 const ChatModel = require("../../models/chatModel");
+const User = require("../../models/userModel");
+
 const BASE_PATH = "/api/chats";
 
 const token = signToken(
@@ -16,6 +19,13 @@ const token = signToken(
 describe("Chat messages", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    User.findById.mockResolvedValue({
+      _id: "66fedbcd52619e12028fb7b7",
+      username: "Megas",
+      password: "123",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
   });
 
   it("GET - list all chats", async () => {
@@ -81,7 +91,8 @@ describe("Chat messages", () => {
     };
 
     ChatModel.create.mockResolvedValue(mockChat);
-
+    console.log("OK aqui 0");
+    console.log("token", token);
     const response = await supertest(app)
       .post(BASE_PATH)
       .set({
