@@ -30,8 +30,8 @@ const getGameFromLocalStorage = () => {
   return game ? JSON.parse(game) : null;
 };
 
-const sendMessages = () => {
-  const messageInput = document.getElementById("messageInput");
+const sendMessages = (messageType = "guess", id = "messageInput") => {
+  const messageInput = document.getElementById(id);
   const message = messageInput.value;
   const user = getUserFromLocalStorage();
   const game = getGameFromLocalStorage();
@@ -43,18 +43,20 @@ const sendMessages = () => {
     username: user.username,
     gameId: game.gameId,
     teamId: game.teamId,
+    messageType,
   });
 
   messageInput.value = "";
 };
 
-document.getElementById("sendButton").onclick = sendMessages;
+document.getElementById("sendButton").onclick = () =>
+  sendMessages("guess", "guessInput");
 document
   .getElementById("messageInput")
   .addEventListener("keypress", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      sendMessages();
+      sendMessages("chat");
     }
   });
 
