@@ -7,6 +7,8 @@ module.exports = [
       globals: {
         ...globals.node,
         ...globals.jest,
+        ...globals.browser,
+        io: "readonly",
       },
     },
   },
