@@ -6,7 +6,8 @@ const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const path = require('path'); 
 
-const userRoutes = require("../src/routes/authRoutes");
+const authRoutes = require("../src/routes/authRoutes");
+const userRoutes = require("../src/routes/userRoutes");
 const gameRoutes = require("../src/routes/gameRoutes");
 const chatRoutes = require("../src/routes/chatRoutes");
 
@@ -17,7 +18,8 @@ app.use(express.static("public"));
 app.use(bodyParser.json());
 
 // Routes
-app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);  
 app.use("/api/games", gameRoutes);
 app.use("/api/chats", chatRoutes);
 
