@@ -91,8 +91,6 @@ describe("Chat messages", () => {
     };
 
     ChatModel.create.mockResolvedValue(mockChat);
-    console.log("OK aqui 0");
-    console.log("token", token);
     const response = await supertest(app)
       .post(BASE_PATH)
       .set({
