@@ -103,7 +103,7 @@ class GameService {
 
                 //get a new word for the next turn
                 game.currentWord = await wordService.generateWord();
-                //game.similarWords = getSimilarWords(game.currentWord);
+                game.similarWords = await wordService.generateSimilarWords(game.currentWord);
 
                 await game.save();
                 return game;
@@ -111,6 +111,14 @@ class GameService {
         }else{
             throw new Error('Game is not in progress or already finished');
         }
+    }
+
+    async getCurrentWord(gameId) {
+        const game = await Game.findById(gameId);
+        if (!game) {
+            throw new Error('Game not found');
+        }
+        return game.currentWord;
     }
   
 }
