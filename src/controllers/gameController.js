@@ -1,6 +1,6 @@
-const Game = require('../models/gameModel');
-const Team = require('../models/teamModel'); 
-const User = require('../models/userModel');
+const Game = require("../models/gameModel");
+const Team = require("../models/teamModel");
+const User = require("../models/userModel");
 
 const gameService = require('../services/gameService');
 
@@ -152,7 +152,7 @@ const endTurn = async (req, res) => {
         console.error('Error ending turn:', error); 
         res.status(500).json({ message: 'Error ending turn', error: error.message });
     }
-};
+}
 
 /*async function nextTurn(gameId) {
 
@@ -224,17 +224,15 @@ const playGame = async (req, res) => {
     }
 };
 
-
 //just to test
 const updateGame = async (gameId, updates) => {
     try {
-        // Encuentra el juego por ID y actualiza solo los campos que necesitas
         const updatedGame = await Game.findByIdAndUpdate(
             gameId, 
             {
                 $set: updates
             },
-            { new: true } // Esto devuelve el documento actualizado
+            { new: true } 
         );
         
         if (!updatedGame) {
@@ -271,6 +269,3 @@ module.exports = {
      playGame,
      getAllGames
 };
-
-
-
