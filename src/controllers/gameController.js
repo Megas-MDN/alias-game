@@ -1,5 +1,4 @@
 const Game = require("../models/gameModel");
-const Team = require("../models/teamModel");
 const User = require("../models/userModel");
 
 const gameService = require('../services/gameService');
@@ -209,7 +208,7 @@ const endTurn = async (req, res) => {
 const playGame = async (req, res) => {
     try {
         const { gameId } = req.params;
-        const game = await gameService.verifyGameProgress(gameId); 
+        //const game = await gameService.verifyGameProgress(gameId); 
 
         const { currentTeamId, currentDescriberId, currentWord } = await gameService.getCurrentTurnInfo(gameId);
 
@@ -225,6 +224,7 @@ const playGame = async (req, res) => {
 };
 
 //just to test
+/*
 const updateGame = async (gameId, updates) => {
     try {
         const updatedGame = await Game.findByIdAndUpdate(
@@ -246,12 +246,12 @@ const updateGame = async (gameId, updates) => {
     }
 };
 
-/*
+/
 const gameId = "67003c5b011492a5cb473d7b";
 const updates = {
     "describerIndices.team2": 0,
     "describerIndices.team1": 0,
-    "currentRound": 2, 
+    "currentRound": 0, 
     currentTurnTeam: "67003c5b011492a5cb473d77", // Modifica el equipo actual
     currentDescriber: "6700377e011492a5cb473d73" // Modifica el describer actual
 };
