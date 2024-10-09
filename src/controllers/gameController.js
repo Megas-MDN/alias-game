@@ -137,6 +137,7 @@ const joinGame = async (req, res) => {
     }
 };
 
+//end turn - finished
 const endTurn = async (req, res) => {
     try {
         const { gameId } = req.params;
@@ -246,7 +247,6 @@ const updateGame = async (gameId, updates) => {
     }
 };
 
-/
 const gameId = "67003c5b011492a5cb473d7b";
 const updates = {
     "describerIndices.team2": 0,
@@ -258,7 +258,11 @@ const updates = {
 
 updateGame(gameId, updates)
     .then(updatedGame => console.log("Game updated:", updatedGame))
-    .catch(err => console.error(err));*/
+    .catch(err => console.error(err)); 
+
+*/
+
+
 
 module.exports = {
      createGame,
