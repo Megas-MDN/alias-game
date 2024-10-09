@@ -55,13 +55,6 @@ class GameService {
         return { currentTeamId, currentDescriberId, currentWord: game.currentWord };
     }
 
-    getNextDescriber(team) {
-        const currentDescriberIndex = team.players.indexOf(team.currentDescriber);
-        
-        const nextIndex = (currentDescriberIndex + 1) % team.players.length;
-        return team.players[nextIndex];
-    }
-
     //Delete this method and use the one from the WordsService.js file
     getRandomWord() {
         const words = ['apple', 'banana', 'orange', 'grape', 'pear']; 
@@ -69,44 +62,66 @@ class GameService {
     }
 
     async nextTurn(gameId) {
-        const game = await this.verifyGameProgress(gameId);
-        console.log('game en nextTurn', game);
-
-        const team1 = game.teams[0];
-        const team2 = game.teams[1];
-
-        //Change the turn to the other team
-        if (game.currentTurnTeam.toString() === team1.toString()) {
-            game.currentTurnTeam = team2;
-        } else {
-            game.currentTurnTeam = team1;
-            game.currentRound++; // If both teams played, increase the round
+        const game = await Game.findById(gameId).populate('teams');
+        
+        if (!game) {
+            throw new Error('Game not found');
         }
 
-        // If they played all rounds, the game is completed
-        if (game.currentRound > game.rounds) {
-            game.status = 'completed';
+        if (game.status === 'in progress') {
+            const team1 = game.teams[0];
+            const team2 = game.teams[1];
 
-            // TO DO - ADD LOGIC TO DETERMINE THE WINNER
-            // 1) check which team is the winner --> with team score
-            // 2) update the user's current game and team
-            // 3) update the user's gamesPlayed and gamesWon
+            console.log("Team 1:", team1);
+            console.log("Team 2:", team2);
 
+            //Change the turn to the other team
+            if (game.currentTurnTeam.toString() === team1._id.toString()) {
+                game.currentTurnTeam = team2._id;
+                game.describerIndices.team2 = (game.describerIndices.team2 + 1) % team2.players.length;
+                game.currentDescriber = team2.players[game.describerIndices.team2];
+            } else {
+                game.currentTurnTeam = team1._id;
+                game.describerIndices.team1 = (game.describerIndices.team1 + 1) % team1.players.length;
+                game.currentDescriber = team1.players[game.describerIndices.team1];
+
+                game.currentRound++;
+            }
+
+            // If they played all rounds, the game is completed
+            if (game.currentRound > game.rounds) {
+                game.status = 'completed';
+
+                // TO DO - ADD LOGIC TO DETERMINE THE WINNER
+                // 1) check which team is the winner --> with team score
+                // 2) update the user's current game and team
+                // 3) update the user's gamesPlayed and gamesWon
+
+            }else{
+                const currentTeam = game.teams.find(t => t._id.toString() === game.currentTurnTeam.toString());
+
+                console.log("Current Team:", currentTeam);
+
+                if (!currentTeam || !currentTeam.players || currentTeam.players.length === 0) {
+                    console.error('Invalid team or no players in the team:', currentTeam);
+                    throw new Error('Current team or its players are invalid');
+                }
+
+                console.log("Players in current team:", currentTeam.players);
+
+                //get a new word for the next turn
+                game.currentWord = this.getRandomWord();
+                //game.similarWords = getSimilarWords(game.currentWord);
+
+                await game.save();
+                return game;
+            }
         }else{
-
-             // Update describer for the current team
-             const currentTeam = game.currentTurnTeam.toString() === team1._id.toString() ? team1 : team2;
-             game.currentDescriber = this.getNextDescriber(currentTeam);
-             
-             // Get a new word for the current round
-             game.currentWord = getNewWord();  // !!! here goes the logic to get a random word    
-            //game.similarWords = getSimilarWords(game.currentWord); // !!! here goes the logic to get similar words
-
+            throw new Error('Game is not in progress or already finished');
         }
-
-        await game.save();
-        return game;
     }
+
+    
 }
 
 module.exports = new GameService();

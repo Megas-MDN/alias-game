@@ -29,6 +29,10 @@ const gameSchema = new mongoose.Schema({
         ref: 'User', 
         required: true, 
     },
+    describerIndices: { 
+        team1: { type: Number, default: 0 }, 
+        team2: { type: Number, default: 0 }  
+    },
     currentWord: { //coffee 
         type: String,
         required: true, 

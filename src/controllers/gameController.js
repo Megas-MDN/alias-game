@@ -138,7 +138,6 @@ const joinGame = async (req, res) => {
     }
 };
 
-
 const endTurn = async (req, res) => {
     try {
         const { gameId } = req.params;
@@ -154,7 +153,6 @@ const endTurn = async (req, res) => {
         res.status(500).json({ message: 'Error ending turn', error: error.message });
     }
 };
-
 
 /*async function nextTurn(gameId) {
 
@@ -207,7 +205,6 @@ const endTurn = async (req, res) => {
 }
 */
 
-
 // Fuction to manage the game - IN PROGRESS 
 const playGame = async (req, res) => {
     try {
@@ -227,6 +224,43 @@ const playGame = async (req, res) => {
     }
 };
 
+
+//just to test
+const updateGame = async (gameId, updates) => {
+    try {
+        // Encuentra el juego por ID y actualiza solo los campos que necesitas
+        const updatedGame = await Game.findByIdAndUpdate(
+            gameId, 
+            {
+                $set: updates
+            },
+            { new: true } // Esto devuelve el documento actualizado
+        );
+        
+        if (!updatedGame) {
+            return { message: "Game not found" };
+        }
+
+        return updatedGame;
+    } catch (error) {
+        console.error("Error updating game:", error);
+        return { message: "Error updating game", error };
+    }
+};
+
+/*
+const gameId = "67003c5b011492a5cb473d7b";
+const updates = {
+    "describerIndices.team2": 0,
+    "describerIndices.team1": 0,
+    "currentRound": 2, 
+    currentTurnTeam: "67003c5b011492a5cb473d77", // Modifica el equipo actual
+    currentDescriber: "6700377e011492a5cb473d73" // Modifica el describer actual
+};
+
+updateGame(gameId, updates)
+    .then(updatedGame => console.log("Game updated:", updatedGame))
+    .catch(err => console.error(err));*/
 
 module.exports = {
      createGame,

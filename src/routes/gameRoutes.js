@@ -6,7 +6,7 @@ const { authenticateToken } = require('../middlewares/authMiddleware');
 //game crud
 router.post('/create', authenticateToken, gameController.createGame); //should require another authentication
 router.get('/:gameId', authenticateToken, gameController.getGameById); //should require another authentication 
-router.get('/', authenticateToken, gameController.getAllGames); //should require another authentication
+router.get('/', gameController.getAllGames); //should require another authentication
 router.delete('/:gameId', authenticateToken, gameController.deleteGameById); //should require another authentication
 
 //to play the game  
