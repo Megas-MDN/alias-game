@@ -1,5 +1,8 @@
 const Game = require('../models/gameModel');
 const Team = require('../models/teamModel');
+const WordService = require('./wordService');
+
+const wordService = new WordService();
 
 class GameService {
     async createGame(firstPlayerId) {
@@ -10,19 +13,14 @@ class GameService {
         try {
             const team1 = await Team.create({ teamName: 'Team 1', players: [firstPlayerId] });
             const team2 = await Team.create({ teamName: 'Team 2', players: [] });
-
-            const getRandomWord = () => {
-                const words = ['apple', 'banana', 'orange']; // Example word list
-                return words[Math.floor(Math.random() * words.length)];
-            };
-
+         
             const game = await Game.create({
                 teams: [team1._id, team2._id],
                 rounds: 3,
                 currentRound: 0,
                 status: 'waiting',
                 currentTurnTeam: team1._id,
-                currentWord: getRandomWord(),
+                currentWord: await wordService.generateWord(),
                 currentDescriber: firstPlayerId,
             });
 
@@ -53,12 +51,6 @@ class GameService {
         const currentDescriberId = game.currentDescriber;
 
         return { currentTeamId, currentDescriberId, currentWord: game.currentWord };
-    }
-
-    //Delete this method and use the one from the WordsService.js file
-    getRandomWord() {
-        const words = ['apple', 'banana', 'orange', 'grape', 'pear']; 
-        return words[Math.floor(Math.random() * words.length)];
     }
 
     async nextTurn(gameId) {
@@ -110,7 +102,7 @@ class GameService {
                 console.log("Players in current team:", currentTeam.players);
 
                 //get a new word for the next turn
-                game.currentWord = this.getRandomWord();
+                game.currentWord = await wordService.generateWord();
                 //game.similarWords = getSimilarWords(game.currentWord);
 
                 await game.save();
@@ -120,8 +112,7 @@ class GameService {
             throw new Error('Game is not in progress or already finished');
         }
     }
-
-    
+  
 }
 
 module.exports = new GameService();

@@ -1,24 +1,26 @@
 const stringSimilarity = require('string-similarity');
-const randomWords = require('random-words');
 const teamService = require('../services/teamService');  // Use teamService to manage teams
+
+const options = {
+  minLength: 3, // Minimum word length
+  maxLength: 8  // Maximum word length 
+};
 
 class WordService {
   constructor() {
     this.rooms = {};  // Stores room info, including teams
   }
 
-  // Async method to generate a new word for the room
-  async generateWord(roomId) {
-    const room = this.rooms[roomId];
-    if (room) {
-      try {
-        const wordData = randomWords();  // Or fetch from database if needed
-        room.currentWord = wordData;  // Assign the new word to the room
-        room.guessedCorrectly = false;
-        console.log(`New word generated for Room ${roomId}: ${room.currentWord}`);
-      } catch (error) {
-        console.error('Error generating word:', error);
-      }
+  // Async method to generate a new wo
+  async generateWord() {
+    try {
+      const randomWords = await import('random-words'); // Import dynamically
+      const wordData = randomWords.generate(options); // Access the default export
+      console.log(`Generated word: ${wordData}`);
+      return wordData; // Return the new word
+    } catch (error) {
+      console.error('Error generating word:', error);
+      throw new Error('Error generating word');
     }
   }
 
