@@ -1,5 +1,6 @@
 const stringSimilarity = require('string-similarity');
-const teamService = require('../services/teamService');  // Use teamService to manage teams
+const leven = require('leven');
+const teamService = require('../services/teamService');  
 
 const options = {
   minLength: 3, // Minimum word length
@@ -11,7 +12,7 @@ class WordService {
     this.rooms = {};  // Stores room info, including teams
   }
 
-  // Async method to generate a new wo
+  //new 
   async generateWord() {
     try {
       const randomWords = await import('random-words'); // Import dynamically
@@ -24,6 +25,28 @@ class WordService {
     }
   }
 
+  //new 
+  async checkUserGuess(wordToGuess, userInput, threshold = 3) {
+    const distance = leven(wordToGuess, userInput);
+  
+    //if the word is exactly the same
+    if (wordToGuess.toLowerCase() === userInput.toLowerCase()) {
+      console.log(`The word '${userInput}' is exactly the same as '${wordToGuess}'`);
+      return 4;  //return 4 points
+    }
+    
+    // If the word is similar enough
+    if (distance <= threshold) {
+      console.log(`The word '${userInput}' is considered similar to '${wordToGuess}' with a distance of ${distance}`);
+      return 2;  //return 2 points
+    } 
+    
+    // If the word is not similar enough
+    console.log(`The word '${userInput}' is not similar enough to '${wordToGuess}'`);
+    return 0;  //return 0 points
+  }
+  
+  /*
   // Async method to allow a player (from a team) to guess the word
   async guessWord(roomId, guessedWord, userId) {
     const room = this.rooms[roomId];
@@ -68,7 +91,8 @@ class WordService {
     };
 
     console.log(`Game started for Room ${roomId} with teams: ${teamIds}`);
-  }
+  }*/
+
 }
 
 module.exports = WordService;
