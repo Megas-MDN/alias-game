@@ -4,17 +4,19 @@ const app = require("../../../app");
 const userModel = require("../../../models/userModel");
 const teamModel = require("../../../models/teamModel");
 
+const MONGO_URl = process.env.MONGO_URI_TESTS || "mongodb://localhost:27017/aliasgame";
+
 describe("Update Specific Team Field Controller", () => {
 
     beforeAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
     });
 
     afterAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
@@ -22,7 +24,7 @@ describe("Update Specific Team Field Controller", () => {
 
     it("should be able to search a update a specific team field", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 1",
@@ -61,7 +63,7 @@ describe("Update Specific Team Field Controller", () => {
 
     it("Should not be able to a update a specific team field, if 'TeamName' field not be a string", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 2",
@@ -101,7 +103,7 @@ describe("Update Specific Team Field Controller", () => {
 
     it("Should not be able to a update a specific team field, if 'team_id' is wrong", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 9",
@@ -144,7 +146,7 @@ describe("Update Specific Team Field Controller", () => {
 
     it("Should not be able to update a team, if 'token' isn't valid", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 4",

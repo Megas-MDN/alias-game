@@ -4,17 +4,19 @@ const mongoose = require("mongoose");
 const userModel = require("../../../models/userModel");
 const teamModel = require("../../../models/teamModel");
 
+const MONGO_URl = process.env.MONGO_URI_TESTS || "mongodb://localhost:27017/aliasgame";
+
 describe("Create Team (Unit Test)", () => {
 
     beforeAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
     });
 
     afterAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
@@ -22,7 +24,7 @@ describe("Create Team (Unit Test)", () => {
 
     it("Should be possible to create a team, if there is a valid user with a valid token", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await inmemoryAuthController.registerUser({
             username: "User 1",
@@ -50,7 +52,7 @@ describe("Create Team (Unit Test)", () => {
 
     it("Should not be able to create a team, if 'TeamName' field not be string", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await inmemoryAuthController.registerUser({
             username: "User 2",
@@ -78,7 +80,7 @@ describe("Create Team (Unit Test)", () => {
 
     it("Should not be able to create a team, if user already have a team", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await inmemoryAuthController.registerUser({
             username: "User 7",
@@ -112,7 +114,7 @@ describe("Create Team (Unit Test)", () => {
 
     it("Should not be able to create a team, if 'token' isn't valid", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await inmemoryAuthController.registerUser({
             username: "User 3",

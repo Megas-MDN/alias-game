@@ -4,17 +4,19 @@ const app = require("../../../app");
 const userModel = require("../../../models/userModel");
 const teamModel = require("../../../models/teamModel");
 
+const MONGO_URl = process.env.MONGO_URI_TESTS || "mongodb://localhost:27017/aliasgame";
+
 describe("Delete Team Controller", () => {
 
     beforeAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
     });
 
     afterAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
@@ -22,7 +24,7 @@ describe("Delete Team Controller", () => {
 
     it("should be able to delete a specific team", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 1",
@@ -57,7 +59,7 @@ describe("Delete Team Controller", () => {
 
     it("Should not be able to delete a team, if 'team_id' is wrong", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 2",
@@ -97,7 +99,7 @@ describe("Delete Team Controller", () => {
 
     it("Should not be able to delete a team, if 'token' isn't valid", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 4",

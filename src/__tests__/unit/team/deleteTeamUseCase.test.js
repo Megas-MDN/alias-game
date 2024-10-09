@@ -4,17 +4,19 @@ const teamModel = require("../../../models/teamModel");
 const inmemoryAuthController = require("../../../controllers/in-memory/in-memory-authController");
 const inMemoryTeamController = require("../../../controllers/in-memory/in-memory-teamController");
 
+const MONGO_URl = process.env.MONGO_URI_TESTS || "mongodb://localhost:27017/aliasgame";
+
 describe("Delete Team (Unit Test)", () => {
 
     beforeAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
     });
 
     afterAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
@@ -22,7 +24,7 @@ describe("Delete Team (Unit Test)", () => {
 
     it("should be able to delete a specific team", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await inmemoryAuthController.registerUser({
             username: "User 1",
@@ -54,7 +56,7 @@ describe("Delete Team (Unit Test)", () => {
 
     it("Should not be able to delete a team, if 'team_id' is wrong", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await inmemoryAuthController.registerUser({
             username: "User 9",
@@ -89,7 +91,7 @@ describe("Delete Team (Unit Test)", () => {
 
     it("Should not be able to delete a team, if 'token' isn't valid", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await inmemoryAuthController.registerUser({
             username: "User 3",

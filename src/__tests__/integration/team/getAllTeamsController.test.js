@@ -4,17 +4,19 @@ const app = require("../../../app");
 const userModel = require("../../../models/userModel");
 const teamModel = require("../../../models/teamModel");
 
+const MONGO_URl = process.env.MONGO_URI_TESTS || "mongodb://localhost:27017/aliasgame";
+
 describe("Get All Teams Controller", () => {
 
     beforeAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
     });
 
     afterAll(async () => {
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
         await userModel.deleteMany({});
         await teamModel.deleteMany({});
         await mongoose.connection.close();
@@ -22,7 +24,7 @@ describe("Get All Teams Controller", () => {
 
     it("should be able to search all teams", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 1",
@@ -53,7 +55,7 @@ describe("Get All Teams Controller", () => {
 
     it("Should not be able to search all teams, if 'token' isn't valid", async () => {
 
-        await mongoose.connect(process.env.MONGO_URI_TESTS);
+        await mongoose.connect(MONGO_URl);
 
         const user = await request(app).post("/api/auth/register").send({
             username: "User 4",

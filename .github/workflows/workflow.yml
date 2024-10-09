@@ -26,6 +26,3 @@ jobs:
       - name: "Run tests"
         working-directory: ./
         run: npm run test
-        env:
-          MONGO_URI_TESTS: ${{ vars.MONGO_URI_TESTS }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
