@@ -1,104 +1,73 @@
+const stringSimilarity = require('string-similarity');
 const randomWords = require('random-words');
+const teamService = require('../services/teamService');  // Use teamService to manage teams
 
-// Alias Game Object
-class wordsService {
+class WordService {
   constructor() {
-    this.rooms = {};
+    this.rooms = {};  // Stores room info, including teams
   }
 
-  // Create a new room
-  createRoom(roomId) {
-    if (!this.rooms[roomId]) {
-      this.rooms[roomId] = {
-        teams: { team1: [], team2: [] }, // Initialize two teams
-        currentTurn: 'team1', // Start with team1
-        score: { team1: 0, team2: 0 },
-        currentWord: null,
-        guessedCorrectly: false
-      };
-      console.log(`Room ${roomId} created!`);
-    } else {
-      console.log(`Room ${roomId} already exists.`);
-    }
-  }
-
-  // Add a player to a team
-  addPlayer(roomId, team, playerName) {
-    const room = this.rooms[roomId];
-    if (room && (team === 'team1' || team === 'team2')) {
-      room.teams[team].push(playerName);
-      console.log(`${playerName} added to ${team} in room ${roomId}.`);
-    } else {
-      console.log('Invalid room or team');
-    }
-  }
-
-  // Generate a random word for the game
-  generateWord(roomId) {
+  // Async method to generate a new word for the room
+  async generateWord(roomId) {
     const room = this.rooms[roomId];
     if (room) {
-      room.currentWord = randomWords();
-      room.guessedCorrectly = false;
-      console.log(`New word generated for Room ${roomId}: ${room.currentWord}`);
+      try {
+        const wordData = randomWords();  // Or fetch from database if needed
+        room.currentWord = wordData;  // Assign the new word to the room
+        room.guessedCorrectly = false;
+        console.log(`New word generated for Room ${roomId}: ${room.currentWord}`);
+      } catch (error) {
+        console.error('Error generating word:', error);
+      }
     }
   }
 
-  // Player guesses the word
-  guessWord(roomId, team, guessedWord) {
+  // Async method to allow a player (from a team) to guess the word
+  async guessWord(roomId, guessedWord, userId) {
     const room = this.rooms[roomId];
-    if (room && room.currentTurn === team && room.currentWord) {
-      if (guessedWord.toLowerCase() === room.currentWord.toLowerCase()) {
-        console.log(`${team} guessed the word correctly!`);
-        room.score[team] += 1;
-        room.guessedCorrectly = true;
-        this.nextTurn(roomId);
-      } else {
-        console.log(`Incorrect guess by ${team}.`);
+    
+    // Find the team the player belongs to
+    const team = await teamService.findUserByid(userId);
+
+    if (!team) {
+      return `User with ID ${userId} is not part of any team!`;
+    }
+
+    if (room && room.currentWord) {
+      try {
+        if (this.checkWordSimilarity(guessedWord, room.currentWord)) {
+          room.guessedCorrectly = true;
+          return `Correct guess by ${userId} from team ${team.teamName}! The word was: ${room.currentWord}`;
+        } else {
+          return 'Incorrect guess!';
+        }
+      } catch (error) {
+        console.error('Error while guessing word:', error);
+        return 'Error during word guessing!';
       }
     } else {
-      console.log('Its not your turn or no word is generated.');
+      return `No word to guess in room ${roomId}!`;
     }
   }
 
-  // Move to the next team's turns
-  nextTurn(roomId) {
-    const room = this.rooms[roomId];
-    if (room) {
-      room.currentTurn = room.currentTurn === 'team1' ? 'team2' : 'team1';
-      console.log(`It's now ${room.currentTurn}'s turn in room ${roomId}.`);
-      this.generateWord(roomId); // Generate a new word for the next round
-    }
+  // Synchronous method to check word similarity
+  checkWordSimilarity(guessedWord, correctWord) {
+    const similarity = stringSimilarity.compareTwoStrings(guessedWord, correctWord);
+    const threshold = 0.8;  // 80% similarity
+    return similarity >= threshold;
   }
 
-  // Display the current score
-  displayScore(roomId) {
-    const room = this.rooms[roomId];
-    if (room) {
-      console.log(`Score in Room ${roomId}: Team1: ${room.score.team1}, Team2: ${room.score.team2}`);
-    }
+  // Async method to start a new game session for teams in the room
+  async startGameForTeams(roomId, teamIds) {
+    this.rooms[roomId] = {
+      currentWord: '',
+      guessedCorrectly: false,
+      teams: teamIds,  // Associate teams with the room
+    };
+
+    console.log(`Game started for Room ${roomId} with teams: ${teamIds}`);
   }
 }
 
-// Example of how the game works
-const aliasGame = new wordsService();
+module.exports = WordService;
 
-// Setup Room
-aliasGame.createRoom('room1');
-
-// Add players to teams
-aliasGame.addPlayer('room1', 'team1', 'Alice');
-aliasGame.addPlayer('room1', 'team2', 'Bob');
-
-// Start the game by generating the first word
-aliasGame.generateWord('room1');
-
-// Team1 makes a guess
-aliasGame.guessWord('room1', 'team1', 'apple'); // Example guess
-
-// Display current score
-aliasGame.displayScore('room1');
-
-// The game automatically switches turns after a correct guess and generates a new word
-aliasGame.guessWord('room1', 'team2', 'banana'); // Team2's turn
-
-aliasGame.displayScore('room1');
