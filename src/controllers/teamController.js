@@ -9,14 +9,14 @@ const createTeamController = async (req, res) => {
         return res.status(401).json({ message: "TeamName field must have a value !" });
 
     }else if(typeof(teamName) !== "string") {
-        return res.status(401).json({ message: "The teamName filed must be a string !" });
+        return res.status(401).json({ message: "The teamName field must be a string !" });
 
     }else {
 
         const checkUserById = await teamService.findUserByid(user.id);
 
         if(checkUserById) {
-            return res.status(404).json({ message: "User already have a team !" });
+            return res.status(401).json({ message: "User already have a team !" });
         }
     
         const team = await teamService.createTeamService({
@@ -46,7 +46,7 @@ const getAllTeamsController = async (req, res) => {
     return res.status(200).json(getAllTeams);
 }
 
-const updateSpecificTeamField = async (req, res) => {
+const updateSpecificTeamFieldController = async (req, res) => {
 
     const { team_id } = req.query;
     const { teamName } = req.body;
@@ -55,7 +55,7 @@ const updateSpecificTeamField = async (req, res) => {
         return res.status(401).json({ message: "TeamName field must have a value !" });
 
     }else if(typeof(teamName) !== "string") {
-        return res.status(401).json({ message: "The teamName filed must be a string !" });
+        return res.status(401).json({ message: "The teamName field must be a string !" });
 
     }else {
 
@@ -71,7 +71,7 @@ const updateSpecificTeamField = async (req, res) => {
     }
 }
 
-const deleteTeam = async (req, res) => {
+const deleteTeamController = async (req, res) => {
 
     const { team_id } = req.query
 
@@ -89,6 +89,6 @@ module.exports = {
     createTeamController,
     getSpecificTeamController,
     getAllTeamsController,
-    updateSpecificTeamField,
-    deleteTeam
+    updateSpecificTeamFieldController,
+    deleteTeamController
 };

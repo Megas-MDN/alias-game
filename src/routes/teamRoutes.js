@@ -7,7 +7,7 @@ const router = Router();
 router.post("/", authenticateToken, teamController.createTeamController);
 router.get("/searchTeam", authenticateToken, teamController.getSpecificTeamController);
 router.get("/getAllTeams", authenticateToken, teamController.getAllTeamsController);
-router.patch("/updateSpecificTeamField", authenticateToken, teamController.updateSpecificTeamField);
-router.delete("/deleteTeam", authenticateToken, teamController.deleteTeam);
+router.patch("/updateSpecificTeamField", authenticateToken, teamController.updateSpecificTeamFieldController);
+router.delete("/deleteTeam", authenticateToken, teamController.deleteTeamController);
 
 module.exports = router;
