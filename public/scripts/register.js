@@ -7,7 +7,7 @@ const setInLocalStorage = (key, value) => {
   return value;
 };
 const fetchLogin = async (username, password) => {
-  const response = await fetch("/api/users/login", {
+  const response = await fetch("/api/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -19,7 +19,7 @@ const fetchLogin = async (username, password) => {
 };
 
 const fetchRegsister = async (username, password) => {
-  const response = await fetch("/api/users/register", {
+  const response = await fetch("/api/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
