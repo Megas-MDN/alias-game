@@ -88,6 +88,12 @@ const joinGame = async (req, res) => {
     if (!game) {
       //if there is no game waiting, create a new one
       game = await gameService.createGame(userId);
+
+      return res.status(201).json({
+        message: "You're the first player to join. A new game has been created.",
+        gameId: game._id,
+        teamId: game.teams[0]._id,  
+      });
     }
 
     //get the teams of the game
