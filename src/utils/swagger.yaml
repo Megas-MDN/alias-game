@@ -6,9 +6,10 @@ info:
 servers:
   - url: http://localhost:3001/api
 paths:
-  /users/register:
+  /auth/register:
     post:
       summary: User registration
+      description: Register a User
       tags:
         - Auth
       requestBody:
@@ -22,16 +23,48 @@ paths:
                   type: string
                 password:
                   type: string
+              description:  Mandatory field for register a User
+              example:
+                username: Some User
+                password: some password
       responses:
         '201':
-          description: User registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    type: object
+                  username:
+                    type: string
+                  gamesPlayed:
+                    type: number
+                  gamesWon:
+                    type: number
+                  _id:
+                    type: string
+                  __v: 
+                    type: number
+                example:
+                  message: User registered
+                  user: 
+                    username: Some User
+                    gamesPlayed: 0
+                    gamesWon: 0
+                    _id: 6705917a8d51ae7a83f93534,
+                    __v: 0
         '400':
           description: User already exists
         '500':
           description: Internal server error
-  /users/login: 
+
+  /auth/login: 
     post:
       summary: User login
+      description: Login a User
       tags:
         - Auth
       requestBody:
@@ -45,6 +78,10 @@ paths:
                   type: string
                 password:
                   type: string
+              description:  Mandatory field for login a User
+              example:
+                username: Same userName
+                password: Same password
       responses:
         '200':
           description: Successfully logged in
@@ -59,10 +96,15 @@ paths:
                   token:
                     type: string
                     description: JWT token
+                example:
+                  message: Logged in 
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MDU5MTdhOGQ1MWFlN2E4M
+                  id: 6705917a8d51ae7a83f93534,
         '400':
           description: Invalid credentials
         '500':
           description: Internal server error
+
   /games/{gameId}:
     get:
       summary: Get game by ID
@@ -155,4 +197,241 @@ paths:
             minimum: 1
           description: The game ID to delete
   /games/join:   
-  /games/play:      
+  /games/play:
+
+  /teams/:
+    post:
+      summary: Create Team
+      description: Create a Team
+      tags:
+        - Team
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teamName:
+                  type: string
+              description:  Mandatory field for create a Team
+              example:
+                teamName: Team Name
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  teamName:
+                    type: string
+                  players:
+                    type: [string]
+                  score:
+                    type: number
+                  _id:
+                    type: string
+                  createdAt:
+                    type: string
+                  updatedAt: 
+                    type: string
+                  __v:
+                    type: number
+                example:
+                    teamName: Team Name,
+                    players: [ 67057edd891f4df747d54904 ]
+                    score: 0,
+                    _id: 67057d70891f4df747d548fd
+                    createdAt: 2024-10-08T18:50:05.575Z,
+                    updatedAt: 2024-10-08T18:50:05.575Z,
+                    __v: 0
+        '401':
+          description: Authorization header missing (OR) TeamName field must have a value ! (OR) The teamName field must be a string ! (OR) User already have a team !
+        '403':
+          description: Invalid token
+
+  /teams/searchTeam:
+    get:
+      summary: Get a specific team
+      description:  Search a specific team
+      tags: 
+        - Team
+      security: [ { bearerAuth: [] } ]
+      parameters: 
+        - in: query
+          name: team_id
+          required: true
+          schema: 
+          type: string
+          format: ObjectId
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  teamName:
+                    type: string
+                  players:
+                    type: [string]
+                  score:
+                    type: number
+                  createdAt:
+                    type: string
+                  updatedAt: 
+                    type: string
+                  __v:
+                    type: number
+                example:
+                    _id: 67057d70891f4df747d548fd
+                    teamName: Team Name,
+                    players: [ 67057edd891f4df747d54904 ]
+                    score: 0
+                    createdAt: 2024-10-08T18:50:05.575Z
+                    updatedAt: 2024-10-08T18:50:05.575Z
+                    __v: 0
+        '401':
+          description: Authorization header missing
+        '403':
+          description: Invalid token 
+        '404':
+          description: Team Not Found !
+
+  /teams/getAllTeams:
+    get:
+      summary: Get all teams
+      description:  Get all teams
+      tags: 
+        - Team
+      security: [ { bearerAuth: [] } ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  teamName:
+                    type: string
+                  players:
+                    type: [string]
+                  score:
+                    type: number
+                  createdAt:
+                    type: string
+                  updatedAt: 
+                    type: string
+                  __v:
+                    type: number
+                example: 
+                    _id: 670569e031b1d7699ba0ff24
+                    teamName: Team Name
+                    players: [ 67057edd891f4df747d54904 ]
+                    score: 0
+                    createdAt: 2024-10-08T18:50:05.575Z
+                    updatedAt: 2024-10-08T18:50:05.575Z
+                    __v: 0
+        '401':
+          description: Authorization header missing
+        '403':
+          description: Invalid token 
+
+  /teams/updateSpecificTeamField:
+    patch:
+      summary: Update team field
+      description: Update specific team field
+      tags: 
+        - Team
+      security: [ { bearerAuth: [] } ]
+      parameters: 
+        - in: query
+          name: team_id
+          required: true
+          schema: 
+          type: string
+          format: ObjectId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teamName:
+                  type: string
+              description:  Mandatory field for create a Team
+              example:
+                teamName: Team Name
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  teamName:
+                    type: string
+                  players:
+                    type: [string]
+                  score:
+                    type: number
+                  createdAt:
+                    type: string
+                  updatedAt: 
+                    type: string
+                  __v:
+                    type: number
+                example:
+                    _id: 67057d70891f4df747d548fd
+                    teamName: Team Name,
+                    players: [ 67057edd891f4df747d54904 ]
+                    score: 0
+                    createdAt: 2024-10-08T18:50:05.575Z
+                    updatedAt: 2024-10-08T18:50:05.575Z
+                    __v: 0
+        '401':
+          description: Authorization header missing (OR) TeamName field must have a value ! (OR) The teamName field must be a string !
+        '403':
+          description: Invalid token
+        '404':
+          description: Team Not Found !
+
+  /teams/deleteTeam:
+    delete:
+      summary: Delete team
+      description: Delete team
+      tags: 
+        - Team
+      security: [ { bearerAuth: [] } ]
+      parameters: 
+        - in: query
+          name: team_id
+          required: true
+          schema: 
+          type: string
+          format: ObjectId
+      responses:
+        '200':
+          description: Team Deleted with sucess !
+        '403':
+          description: Invalid token
+        '404':
+          description: Team Not Found ! 
+      
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerAuth: JWT
+
