@@ -1,6 +1,4 @@
-const stringSimilarity = require('string-similarity');
-//const leven = require('leven');
-const teamService = require('../services/teamService');  
+const leven = require('leven'); 
 
 const options = {
   minLength: 3, // Minimum word length
@@ -28,7 +26,7 @@ class WordService {
   //new 
   async checkUserGuess(wordToGuess, userInput, threshold = 3) {
     const distance = leven(wordToGuess, userInput);
-  
+
     //if the word is exactly the same
     if (wordToGuess.toLowerCase() === userInput.toLowerCase()) {
       console.log(`The word '${userInput}' is exactly the same as '${wordToGuess}'`);
