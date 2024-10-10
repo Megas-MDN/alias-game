@@ -20,7 +20,17 @@ const registerUser = async (req, res) => {
     const user = new User({ username, password: hashedPassword });
     await user.save();
 
-    res.status(201).json({ message: "User registered" });
+    res.status(201).json({
+      message: "User registered",
+      user: {
+        username: user.username,
+        gamesPlayed: user.gamesPlayed,
+        gamesWon: user.gamesWon,
+        _id: user._id,
+        __v: user.__v
+      }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });

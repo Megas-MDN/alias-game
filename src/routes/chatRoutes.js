@@ -10,4 +10,7 @@ router.post("/", authenticateToken, controller.createChat);
 router.put("/:chatId", authenticateToken, controller.updateChat);
 router.delete("/:chatId", authenticateToken, controller.deleteChat);
 
+//new 
+router.post('/message', controller.receiveGuessMessage);
+
 module.exports = router;

@@ -58,4 +58,4 @@ const verifyToken = (token) => {
   return payload;
 };
 
-module.exports = { signToken, verifyToken };
+module.exports = { signToken, verifyToken, createHmacSHA256Signature };
