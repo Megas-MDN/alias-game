@@ -51,7 +51,7 @@
 
     async function checkWordSimilarity(guessedWord, correctWord) {
         const similarity = stringSimilarity.compareTwoStrings(guessedWord, correctWord);
-        const threshold = 0.6;  // 60% similarity
+        const threshold = 0.5;  // 60% similarity
         return similarity >= threshold;
     }
 

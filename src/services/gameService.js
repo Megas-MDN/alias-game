@@ -103,7 +103,6 @@ class GameService {
 
                 //get a new word for the next turn
                 game.currentWord = await wordService.generateWord();
-                game.similarWords = await wordService.generateSimilarWords(game.currentWord);
 
                 await game.save();
                 return game;
@@ -120,6 +119,12 @@ class GameService {
         }
         return game.currentWord;
     }
+
+    //to get all games in progress - backend
+
+    //check if the turn expired - or guessed word - backend 
+
+    
   
 }
 

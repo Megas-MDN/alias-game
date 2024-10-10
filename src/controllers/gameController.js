@@ -154,57 +154,6 @@ const endTurn = async (req, res) => {
     }
 }
 
-/*async function nextTurn(gameId) {
-
-    //find the game by its ID
-    const game = await Game.findById(gameId);
-
-    //if the game does not exist
-    if (!game) {
-        throw new Error('Game not found');
-    }
-
-    //check if the game is in progress
-    if(game.status === 'in progress'){
-
-        const team1 = game.teams[0];
-        const team2 = game.teams[1];
-
-        if (game.currentTurnTeamId.toString() === team1.toString()) {
-            game.currentTurnTeamId = team2; //change the turn to the other team
-        } else {
-            game.currentTurnTeamId = team1;
-            game.currentRound++; //if both teams played, increase the round
-        }
-
-        //if they played all rounds, the game is completed
-        if (game.currentRound > game.rounds) {
-            game.status = 'completed'; 
-
-            // TO DO - ADD LOGIC TO DETERMINE THE WINNER
-            // 1) check which team is the winner --> with team score
-            // 2) update the user's current game and team
-            // 3) update the user's gamesPlayed and gamesWon
-
-        }else{
-            // Update describer for the current team
-            const currentTeam = await Game.findById(game.currentTurnTeamId);
-            game.currentDescriber = getNextDescriber(currentTeam);
-
-            // Get a new word for the current round
-            //game.currentWord = getNewWord();  // !!! here goes the logic to get a random word    
-            //game.similarWords = getSimilarWords(game.currentWord); // !!! here goes the logic to get similar words
-        }
-
-        await game.save();
-        return game;
-        
-    }else{
-        throw new Error('Game is not in progress or already finished');
-    }   
-}
-*/
-
 // Fuction to manage the game - IN PROGRESS 
 const playGame = async (req, res) => {
     try {
@@ -225,13 +174,14 @@ const playGame = async (req, res) => {
 };
 
 //just to test
-/*
+
 const updateGame = async (gameId, updates) => {
     try {
         const updatedGame = await Game.findByIdAndUpdate(
             gameId, 
             {
-                $set: updates
+                $set: updates,
+                $unset: { similarWords: "" }
             },
             { new: true } 
         );
@@ -260,7 +210,7 @@ updateGame(gameId, updates)
     .then(updatedGame => console.log("Game updated:", updatedGame))
     .catch(err => console.error(err)); 
 
-*/
+
 
 
 

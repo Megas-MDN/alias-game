@@ -33,13 +33,10 @@ const gameSchema = new mongoose.Schema({
         team1: { type: Number, default: 0 }, 
         team2: { type: Number, default: 0 }  
     },
-    currentWord: { //coffee 
+    currentWord: {
         type: String,
         required: true, 
     }, 
-    similarWords: [{ //[ tea, milk, sugar ] //library similar words
-        type: String,
-    }],
     correctGuesses: {
         type: Number,
         default: 0, 

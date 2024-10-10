@@ -4,8 +4,7 @@ const ChatModel = require("../models/chatModel");
 const WordService = require("./wordService");
 const GameService = require("./gameService");
 const TeamService = require("./teamService");
-
-const gameService = new GameService();  
+ 
 
 const listAllChats = async (query = {}) => {
   const filters = {
@@ -70,7 +69,7 @@ const handleGuessMessage = async (chatMessage) => {
   const { gameId, teamId, message, messageType } = chatMessage;
 
   if (messageType === 'guess') {
-      const correctWord = await gameService.getCurrentWord(gameId); 
+      const correctWord = await GameService.getCurrentWord(gameId); 
 
       const points = await WordService.checkUserGuess(correctWord, message);
 
