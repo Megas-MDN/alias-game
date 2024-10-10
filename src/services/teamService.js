@@ -20,7 +20,6 @@ const getAllTeams = async () => {
     return find;
 };
 
-
 const updateSpecificTeamField = async (team_id, teamName) => {
     const docFind = await teamModel.findById(team_id);
     docFind.teamName = teamName;
@@ -42,6 +41,15 @@ const findUserByid = async (user_id) => {
     return find;
 };
 
+//new 
+const updateTeamPoints = async (teamId, points) => {
+    const team = await teamModel.findById(teamId); 
+    if (team) {
+      team.score += points; 
+      await team.save(); 
+    }
+}
+  
 module.exports = { 
     createTeamService, 
     getSpecificTeam,
@@ -49,4 +57,5 @@ module.exports = {
     updateSpecificTeamField,
     deleteTeam,
     findUserByid,
+    updateTeamPoints
 };

@@ -34,10 +34,18 @@ const deleteChat = async (req, res) => {
   return res.send(chat);
 };
 
+//new
+const receiveGuessMessage = async(req, res) => {
+  const chatMessage = req.body;
+  await chatService.handleGuessMessage(chatMessage);
+  res.status(200).send('Message processed');
+}
+
 module.exports = {
   listAllChats,
   getChatById,
   createChat,
   updateChat,
   deleteChat,
+  receiveGuessMessage,
 };

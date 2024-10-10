@@ -3,13 +3,16 @@ const router = express.Router();
 const gameController = require('../controllers/gameController'); 
 const { authenticateToken } = require('../middlewares/authMiddleware');
 
-router.post('/join', authenticateToken, gameController.joinGame); 
-router.get('/:gameId', gameController.getGameById); //to check the game status
-router.delete('/:gameId', gameController.deleteGameById); //to delete the game
-router.post('/:gameId/endTurn', gameController.endTurn);
+//game crud
+router.post('/create', authenticateToken, gameController.createGame); //should require another authentication
+router.get('/:gameId', authenticateToken, gameController.getGameById); //should require another authentication 
+router.get('/', gameController.getAllGames); //should require another authentication
+router.delete('/:gameId', authenticateToken, gameController.deleteGameById); //should require another authentication
 
-//to play the game - IN PROGRESS
-router.post('/play', authenticateToken, gameController.playGame);
+//to play the game  
+router.post('/join', authenticateToken, gameController.joinGame); //finished
+router.post('/:gameId/play', gameController.playGame);
+router.post('/:gameId/endTurn', gameController.endTurn); //in progress
 
 
 module.exports = router;
