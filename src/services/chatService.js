@@ -71,7 +71,8 @@ const handleGuessMessage = async (chatMessage) => {
   if (messageType === 'guess') {
       const correctWord = await GameService.getCurrentWord(gameId); 
 
-      const points = await WordService.checkUserGuess(correctWord, message);
+      const wordService = new WordService();
+      const points = await wordService.checkUserGuess(correctWord, message);
 
       if (points > 0) {
           //update team points

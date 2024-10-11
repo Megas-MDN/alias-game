@@ -38,7 +38,7 @@ const deleteChat = async (req, res) => {
 const receiveGuessMessage = async(req, res) => {
   const chatMessage = req.body;
   await chatService.handleGuessMessage(chatMessage);
-  res.status(200).send('Message processed');
+  res.status(200).json({ message: "Message processed"});
 }
 
 module.exports = {
