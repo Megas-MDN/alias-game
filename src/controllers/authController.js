@@ -3,41 +3,50 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 const { signToken } = require("../utils/jwt");
 
-const registerUser = async (req, res) => {
-  const { username, password } = req.body;
-
+const createAdminController = async (req, res) => {
   try {
-    // Check if user exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+      const { username, password } = req.body;
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new user
-    const user = new User({ username, password: hashedPassword });
-    await user.save();
-
-    res.status(201).json({
-      message: "User registered",
-      user: {
-        username: user.username,
-        gamesPlayed: user.gamesPlayed,
-        gamesWon: user.gamesWon,
-        _id: user._id,
-        __v: user.__v
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+          return res.status(400).json({ message: 'User already exists' });
       }
-    });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const newAdmin = new User({
+          username,
+          password: hashedPassword,
+          role: 'admin'
+      });
+
+      await newAdmin.save();
+
+      const token = signToken(
+          { id: newAdmin._id, username: newAdmin.username },
+          process.env.JWT_SECRET,
+          "1h",
+        );
+
+      return res.status(201).json({
+          message: 'Admin created successfully',
+          _id: newAdmin._id,
+          username: newAdmin.username,
+          gamesPlayed: newAdmin.gamesPlayed,
+          gamesWon: newAdmin.gamesWon,
+          currentGame: newAdmin.currentGame,
+          team: newAdmin.team,
+          role: newAdmin.role,
+          token: token
+      });
+
+  } catch (error) {
+      console.error('Error creating admin:', error);
+      return res.status(500).json({ message: 'Error creating admin' });
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUserController = async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -74,8 +83,8 @@ const findUserById = async (id) => {
   }
 };
 
-module.exports = { 
-  registerUser, 
-  loginUser, 
+module.exports = {
+  createAdminController,  
+  loginUserController, 
   findUserById
 };

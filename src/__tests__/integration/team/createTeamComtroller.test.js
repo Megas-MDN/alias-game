@@ -26,7 +26,7 @@ describe("Create Team Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 1",
             password: "1234"
         });
@@ -57,7 +57,7 @@ describe("Create Team Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 2",
             password: "4466"
         });
@@ -88,7 +88,7 @@ describe("Create Team Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 3",
             password: "5588"
         });
@@ -128,7 +128,7 @@ describe("Create Team Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 4",
             password: "1122"
         });
