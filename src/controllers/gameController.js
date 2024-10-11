@@ -80,7 +80,7 @@ const deleteGameById = async (req, res) => {
 const changeGameStatus = async (req, res) => {
   const { gameId, status } = req.body;
   try {
-     await gameService.changeGameStatus(gameId, status);
+    const game = await gameService.changeGameStatus(gameId, status);
 
   }catch(error){
     console.error("Error changing game status:", error);
