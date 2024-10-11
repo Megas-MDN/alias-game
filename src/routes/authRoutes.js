@@ -8,7 +8,7 @@ const router = Router();
 router.post('/createAdmin', authenticateToken, authController.createAdminController);
 
 // Login route
-router.post('/login', authController.loginUserController);
+router.post('/login', authenticateToken, authController.loginUserController);
 
 // Protected route test 
 router.get('/protected', authenticateToken, (req, res) => {
