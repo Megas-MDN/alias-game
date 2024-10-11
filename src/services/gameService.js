@@ -1,8 +1,12 @@
 const Game = require('../models/gameModel');
 const Team = require('../models/teamModel');
+
 const WordService = require('./wordService');
+const userService = require('./userService');
+const TeamService = require("./teamService");
 
 const wordService = new WordService();
+
 
 class GameService {
     async createGame(firstPlayerId) {
@@ -82,12 +86,9 @@ class GameService {
 
             // If they played all rounds, the game is completed
             if (game.currentRound > game.rounds) {
-                game.status = 'completed';
-
-                // TO DO - ADD LOGIC TO DETERMINE THE WINNER
-                // 1) check which team is the winner --> with team score
-                // 2) update the user's current game and team
-                // 3) update the user's gamesPlayed and gamesWon
+                game.status = 'finished';
+                console.log('Game finished!');
+                await this.determineWinner(gameId);
 
             }else{
                 const currentTeam = game.teams.find(t => t._id.toString() === game.currentTurnTeam.toString());
@@ -120,12 +121,104 @@ class GameService {
         return game.currentWord;
     }
 
+    //new 
+    async determineWinner(gameId) {
+        try{
+            const game = await Game.findById(gameId).populate('teams'); 
+
+            if (!game) {
+                throw new Error('Game not found');
+            }
+
+            if(game.status == 'finished'){
+                //get the points of each team
+                const pointsTeam1 = game.teams[0].score;
+                const pointsTeam2 = game.teams[1].score;
+
+                console.log(`Team 1: ${pointsTeam1} points`);
+                console.log(`Team 2: ${pointsTeam2} points`);
+
+                let winnerTeam = null;
+
+                if (pointsTeam1 > pointsTeam2) {
+                    winnerTeam = game.teams[0];
+                } else if (pointsTeam2 > pointsTeam1) {
+                    winnerTeam = game.teams[1];
+                }else{
+                    console.log('The game is a tie!');
+                    return winnerTeam;
+                    // who is the winner (?)
+                }
+
+                //update user stats
+                console.log(`The winner is: ${winnerTeam.teamName}`);
+                await this.updateUserGameStats(winnerTeam._id);
+                //update user current game and team
+                await this.updateCurrentGameAndTeam(winnerTeam._id);
+
+            }else{
+                throw new Error('Game is not finished yet');
+            }
+
+        }catch(error){
+            console.error('Error determining the winner:', error);
+            throw new Error('Error determining the winner');
+        }
+    }
+
+    async updateUserGameStats(teamId) {
+        console.log(`Updating user stats for team ${teamId}`);
+        const usersInTeam = await TeamService.getUsersByTeamId(teamId); //Get all users in the team
+
+        console.log("Users in team:", usersInTeam); 
+        for (const user of usersInTeam) {
+            await userService.updateUserStats(user._id); // Update user stats
+            console.log(`User stats updated`);
+        }
+    }
+
+    async updateCurrentGameAndTeam(teamId) {
+        console.log(`Updating current game and team for team ${teamId}`);
+        const usersInTeam = await TeamService.getUsersByTeamId(teamId); //Get all users in the team
+        for (const user of usersInTeam) {
+            await userService.updateUserCurrentGameAndTeam(user._id); // Update user current game and team
+            console.log(`User current game and team updated`);
+        }
+    }
+
+    //new
+    async processGuess (chatMessage){
+        const { gameId, teamId, message, messageType } = chatMessage;
+      
+        if (messageType === 'guess') {
+            const correctWord = await this.getCurrentWord(gameId); 
+      
+            const points = await wordService.checkUserGuess(correctWord, message);
+      
+            if (points > 0) {
+                //update team points
+                await TeamService.updateTeamPoints(teamId, points);
+                console.log(`Team ${teamId} receives ${points} points!`);
+            } else {
+                console.log(`No points awarded for team ${teamId}.`);
+            }
+        }
+    }
+
+    //new
+    async changeGameStatus(gameId, status){
+        const game = await Game.findById(gameId);
+        if (!game) {
+            throw new Error('Game not found');
+        }
+        game.status = status;
+        await game.save();
+        return game;
+    }
+
     //to get all games in progress - backend
 
     //check if the turn expired - or guessed word - backend 
-
-    
-  
 }
 
 module.exports = new GameService();

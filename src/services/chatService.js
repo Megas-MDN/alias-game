@@ -1,9 +1,7 @@
 const ChatModel = require("../models/chatModel");
 
 //new 
-const WordService = require("./wordService");
 const GameService = require("./gameService");
-const TeamService = require("./teamService");
  
 
 const listAllChats = async (query = {}) => {
@@ -64,23 +62,12 @@ const createChat = async (data = {}) => {
   return chat;
 };
 
-//new 
+//new -
 const handleGuessMessage = async (chatMessage) => {
-  const { gameId, teamId, message, messageType } = chatMessage;
+  const { messageType } = chatMessage;
 
   if (messageType === 'guess') {
-      const correctWord = await GameService.getCurrentWord(gameId); 
-
-      const wordService = new WordService();
-      const points = await wordService.checkUserGuess(correctWord, message);
-
-      if (points > 0) {
-          //update team points
-          await TeamService.updateTeamPoints(teamId, points);
-          console.log(`Team ${teamId} receives ${points} points!`);
-      } else {
-          console.log(`No points awarded for team ${teamId}.`);
-      }
+    await GameService.processGuess(chatMessage);
   }
 }
 
