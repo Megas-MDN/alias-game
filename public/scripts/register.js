@@ -19,7 +19,7 @@ const fetchLogin = async (username, password) => {
 };
 
 const fetchRegsister = async (username, password) => {
-  const response = await fetch("/api/auth/register", {
+  const response = await fetch("/api/users/createUser", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
