@@ -26,7 +26,7 @@ describe("Update Specific Team Field Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 1",
             password: "6644"
         });
@@ -65,7 +65,7 @@ describe("Update Specific Team Field Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 2",
             password: "4466"
         });
@@ -105,7 +105,7 @@ describe("Update Specific Team Field Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 9",
             password: "4466"
         });
@@ -148,7 +148,7 @@ describe("Update Specific Team Field Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 4",
             password: "1122"
         })

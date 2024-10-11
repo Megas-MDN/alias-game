@@ -26,7 +26,7 @@ describe("Get All Teams Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 1",
             password: "6644"
         });
@@ -57,7 +57,7 @@ describe("Get All Teams Controller", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await request(app).post("/api/auth/register").send({
+        const user = await request(app).post("/api/users/createUser").send({
             username: "User 4",
             password: "1122"
         });

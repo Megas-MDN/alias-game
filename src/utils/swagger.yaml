@@ -6,12 +6,12 @@ info:
 servers:
   - url: http://localhost:3001/api
 paths:
-  /auth/register:
+  /users/createUser:
     post:
-      summary: User registration
-      description: Register a User
+      summary: Create User
+      description: Create a User
       tags:
-        - Auth
+        - User
       requestBody:
         required: true
         content:
