@@ -1,13 +1,14 @@
-const express = require('express');
-const { registerUser, loginUser } = require('../controllers/authController');
+const { Router } = require('express');
 const { authenticateToken, isAdmin } = require('../middlewares/authMiddleware');
-const router = express.Router();
+const authController = require('../controllers/authController');
 
-// Register route
-router.post('/register', registerUser);
+const router = Router();
+
+// Create User Admin
+router.post('/createAdmin', authenticateToken, authController.createAdminController);
 
 // Login route
-router.post('/login', loginUser);
+router.post('/login', authenticateToken, authController.loginUserController);
 
 // Protected route test 
 router.get('/protected', authenticateToken, (req, res) => {
