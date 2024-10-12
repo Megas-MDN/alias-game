@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const userModel = require("../../../models/userModel");
 const teamModel = require("../../../models/teamModel");
+const inmemoryUserController = require("../../../controllers/in-memory/in-memory-userController");
 const inmemoryAuthController = require("../../../controllers/in-memory/in-memory-authController");
 const inMemoryTeamController = require("../../../controllers/in-memory/in-memory-teamController");
 
@@ -26,12 +27,12 @@ describe("Get Specific Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 1",
             password: "6644"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "6644"
         });
@@ -59,12 +60,12 @@ describe("Get Specific Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 2",
             password: "8899"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "8899"
         });
@@ -94,12 +95,12 @@ describe("Get Specific Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 8",
             password: "1122"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "1122"
         });

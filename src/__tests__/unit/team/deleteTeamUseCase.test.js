@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const userModel = require("../../../models/userModel");
 const teamModel = require("../../../models/teamModel");
+const inmemoryUserController = require("../../../controllers/in-memory/in-memory-userController");
 const inmemoryAuthController = require("../../../controllers/in-memory/in-memory-authController");
 const inMemoryTeamController = require("../../../controllers/in-memory/in-memory-teamController");
 
@@ -26,12 +27,12 @@ describe("Delete Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 1",
             password: "4467"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "4467"
         });
@@ -58,12 +59,12 @@ describe("Delete Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 9",
             password: "1122"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "1122"
         });
@@ -93,12 +94,12 @@ describe("Delete Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 3",
             password: "2233"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "2233"
         });

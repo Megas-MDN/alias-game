@@ -1,4 +1,4 @@
-const InMemoryAuthenticateToken = require("../../middlewares/in-memory/in-memory-authMiddleware");
+const inMemoryAuthenticateToken = require("../../middlewares/in-memory/in-memory-authenticateToken");
 const teamService = require("../../services/teamService");
 
 const inMemoryTeamController = {
@@ -16,7 +16,7 @@ const inMemoryTeamController = {
                 throw new Error("User already have a team !");
             }
 
-            const checkToken = await InMemoryAuthenticateToken(datas.token);
+            const checkToken = await inMemoryAuthenticateToken(datas.token);
 
             if(checkToken === true) {
 
@@ -38,7 +38,7 @@ const inMemoryTeamController = {
             throw new Error("Team Not Found !");
         }
 
-        const checkToken = await InMemoryAuthenticateToken(datas.token);
+        const checkToken = await inMemoryAuthenticateToken(datas.token);
 
         if(checkToken === true) {
             return findTeamById;
@@ -48,7 +48,7 @@ const inMemoryTeamController = {
     
     async getAllTeamsController(token) {
 
-        const checkToken = await InMemoryAuthenticateToken(token);
+        const checkToken = await inMemoryAuthenticateToken(token);
 
         if(checkToken === true) {
             const getAllTeams = await teamService.getAllTeams();
@@ -70,7 +70,7 @@ const inMemoryTeamController = {
                 throw new Error("Team Not Found !");
             }
 
-            const checkToken = await InMemoryAuthenticateToken(datas.token);
+            const checkToken = await inMemoryAuthenticateToken(datas.token);
 
             if(checkToken === true) {
                 const updateTeamNameField = await teamService.updateSpecificTeamField(datas.team_id, datas.teamName);
@@ -88,7 +88,7 @@ const inMemoryTeamController = {
             throw new Error("Team Not Found !");
         }
 
-        const checkToken = await InMemoryAuthenticateToken(datas.token);
+        const checkToken = await inMemoryAuthenticateToken(datas.token);
 
         if(checkToken === true) {
             await teamService.deleteTeam(datas.team_id);

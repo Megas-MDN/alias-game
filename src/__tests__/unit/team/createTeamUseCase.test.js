@@ -1,8 +1,9 @@
-const inMemoryTeamController = require("../../../controllers/in-memory/in-memory-teamController");
-const inmemoryAuthController = require("../../../controllers/in-memory/in-memory-authController");
 const mongoose = require("mongoose");
 const userModel = require("../../../models/userModel");
 const teamModel = require("../../../models/teamModel");
+const inmemoryUserController = require("../../../controllers/in-memory/in-memory-userController");
+const inmemoryAuthController = require("../../../controllers/in-memory/in-memory-authController");
+const inMemoryTeamController = require("../../../controllers/in-memory/in-memory-teamController");
 
 const MONGO_URl = process.env.MONGO_URI_TESTS || "mongodb://localhost:27017/aliasgame";
 
@@ -26,12 +27,12 @@ describe("Create Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 1",
             password: "1234"
         });
 
-        const login = await inmemoryAuthController.loginUser({
+        const login = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "1234"
         });
@@ -54,12 +55,12 @@ describe("Create Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 2",
             password: "4466"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "4466"
         });
@@ -82,12 +83,12 @@ describe("Create Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 7",
             password: "9922"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "9922"
         });
@@ -116,7 +117,7 @@ describe("Create Team (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 3",
             password: "5577"
         });
