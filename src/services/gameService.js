@@ -5,10 +5,35 @@ const WordService = require('./wordService');
 const userService = require('./userService');
 const TeamService = require("./teamService");
 
+
 const wordService = new WordService();
 
 
 class GameService {
+
+    //CRUD operations
+    async getGameById(gameId) {
+        const game = await Game.findById(gameId).populate({
+          path: "teams",
+          populate: {
+            path: "players", 
+            select: "username", 
+          },
+        });
+        return game;
+    }
+      
+    async getSpecificGame(gameId)  {
+        const find = await Game.findById(gameId);
+        return find;
+    };
+  
+    async deleteGame(gameId) {
+        await Game.deleteOne({
+            _id: gameId
+        });
+    };
+
     async createGame(firstPlayerId) {
         if (!firstPlayerId) {
             throw new Error('firstPlayerId is required to create a game');
@@ -216,9 +241,6 @@ class GameService {
         return game;
     }
 
-    //to get all games in progress - backend
-
-    //check if the turn expired - or guessed word - backend 
 }
 
 module.exports = new GameService();

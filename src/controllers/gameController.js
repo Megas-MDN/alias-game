@@ -29,19 +29,12 @@ const getGameById = async (req, res) => {
   const { gameId } = req.params;
 
   try {
-    // Search the game by its ID and populate the teams and players
-    const game = await Game.findById(gameId).populate({
-      path: "teams",
-      populate: {
-        path: "players", //populate the players of the teams
-        select: "username email", //only return the username and email of the players
-      },
-    });
+    const game = await gameService.getGameById(gameId);
 
     if (!game) {
       return res.status(404).json({ message: "Game not found" });
     }
-
+    
     res.json(game);
   } catch (error) {
     console.error("Error fetching game:", error);
@@ -62,18 +55,14 @@ const getAllGames = async (req, res) => {
 const deleteGameById = async (req, res) => {
   const { gameId } = req.params;
 
-  try {
-    const deletedGame = await Game.findByIdAndDelete(gameId);
+  const findGameById = await gameService.getSpecificGame(gameId);
 
-    if (!deletedGame) {
-      return res.status(404).json({ message: "Game not found" });
-    }
-
-    return res.status(200).json({ message: "Game deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting game:", error);
-    return res.status(500).json({ error: "Failed to delete game" });
+  if(!findGameById) {
+      return res.status(404).json({ message: "Game Not Found !" });
   }
+
+  await gameService.deleteGame(gameId);
+  return res.status(200).json({ message: "Game Deleted with sucess !" });
 };
 
 //new 
