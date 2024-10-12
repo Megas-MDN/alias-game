@@ -4,53 +4,69 @@ const User = require("../models/userModel");
 const { signToken } = require("../utils/jwt");
 
 const createAdminController = async (req, res) => {
-  try {
-      const { username, password } = req.body;
+  
+  const { username, password } = req.body;
 
-      const existingUser = await User.findOne({ username });
-      if (existingUser) {
-          return res.status(401).json({ message: 'User already exists' });
-      }
+  if(username === "" || password === "") {
+     return res.status(401).json({ message: "The fields must have a value !" });
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+  }else if(typeof(username) !== "string" || typeof(password) !== "string") {
+    return res.status(401).json({ message: "The fileds must be a string !" });
 
-      const newAdmin = new User({
-          username,
-          password: hashedPassword,
-          role: 'admin'
-      });
+  }else {
 
-      await newAdmin.save();
+    const existingUser = await User.findOne({ username });
 
-      const token = signToken(
-          { id: newAdmin._id, username: newAdmin.username },
-          process.env.JWT_SECRET,
-          "1h",
-        );
+    if (existingUser) {
+      return res.status(401).json({ message: 'User already exists' });
+    }
+  
+    const hashedPassword = await bcrypt.hash(password, 10);
+  
+    const newAdmin = new User({
+      username,
+      password: hashedPassword,
+      role: 'admin'
+    });
+  
+    await newAdmin.save();
+  
+    const token = signToken(
+      { id: newAdmin._id, username: newAdmin.username },
+      process.env.JWT_SECRET,
+      "1h",
+    );
+  
+    return res.status(201).json({
+      message: 'Admin created successfully',
+      _id: newAdmin._id,
+      username: newAdmin.username,
+      gamesPlayed: newAdmin.gamesPlayed,
+      gamesWon: newAdmin.gamesWon,
+      currentGame: newAdmin.currentGame,
+      team: newAdmin.team,
+      role: newAdmin.role,
+      adminToken: token
+    });
 
-      return res.status(201).json({
-          message: 'Admin created successfully',
-          _id: newAdmin._id,
-          username: newAdmin.username,
-          gamesPlayed: newAdmin.gamesPlayed,
-          gamesWon: newAdmin.gamesWon,
-          currentGame: newAdmin.currentGame,
-          team: newAdmin.team,
-          role: newAdmin.role,
-          adminToken: token
-      });
-
-  } catch (error) {
-      console.error('Error creating admin:', error);
-      return res.status(500).json({ message: 'Error creating admin' });
   }
+
 };
 
 const loginUserController = async (req, res) => {
+
   const { username, password } = req.body;
 
-  try {
+  if(username === "" || password === "") {
+    return res.status(401).json({ message: "The fields must have a value !" });
+
+  }else if(typeof(username) !== "string" || typeof(password) !== "string") {
+    return res.status(401).json({ message: "The fileds must be a string !" });
+
+  }else {
+
     const user = await User.findOne({ username });
+
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -69,10 +85,8 @@ const loginUserController = async (req, res) => {
     );
 
     res.status(200).json({ message: "Logged in", token, id: user._id });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
   }
+
 };
 
 const findUserById = async (id) => {

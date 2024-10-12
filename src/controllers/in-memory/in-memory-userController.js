@@ -6,31 +6,41 @@ const inMemoryUserController = {
 
     async createUserController(datas) {
 
-        const existingUser = await userService.findUserByUsername(datas.username);
+        if(datas.username === "" || datas.password === "") {
+            throw new Error("The fields must have a value !");
+    
+        }else if(typeof(datas.username) !== "string" || typeof(datas.password) !== "string") {
+            throw new Error("The fileds must be a string !");
+    
+        }else {
 
-        if (existingUser) {
-            throw new Error("User already exists");
-        }
+            const existingUser = await userService.findUserByUsername(datas.username);
 
-        const hashedPassword = await hash(datas.password, 10);
+            if (existingUser) {
+                throw new Error("User already exists");
+            }
 
-        const user = await userService.createUser({
-            username: datas.username,
-            password: hashedPassword
-        });
+            const hashedPassword = await hash(datas.password, 10);
 
-        const res = {
-            _id: user._id,
-            username: user.username,
-            gamesPlayed: user.gamesPlayed,
-            gamesWon: user.gamesWon,
-            role: user.role,
-            __v: user.__v
-        }
+            const user = await userService.createUser({
+                username: datas.username,
+                password: hashedPassword
+            });
 
-        const message = "User registered";
+            const res = {
+                _id: user._id,
+                username: user.username,
+                gamesPlayed: user.gamesPlayed,
+                gamesWon: user.gamesWon,
+                role: user.role,
+                __v: user.__v
+            }
 
-        return { message, res }; 
+            const message = "User registered";
+
+            return { message, res };
+
+        } 
     },
 
     async getSpecificUserController(datas)  {
