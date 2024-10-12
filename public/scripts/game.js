@@ -127,7 +127,7 @@ socket.on("receiveMessage", (data) => {
 const toggleTurn = async () => {
   await fetchChangeTurn();
   await setGameDetails();
-  updateTimerDisplay();
+  resetTimer();
   startTimer();
 };
 
@@ -139,15 +139,19 @@ const showTheWord = (theWord) => {
   wordToGuess.innerHTML = "";
 };
 
-socket.on("startGame", (data) => {
-  console.log("Game Started", data, "<<< Games");
+socket.on("startGame", () => {
+  resetTimer();
   startTimer();
   setGameDetails().then((r) => {
     showTheWord(r?.currentWord);
   });
 });
 
-socket.on("hitTheWord", (data) => {
+socket.on("hitTheWord", () => {
+  toggleTurn();
+});
+
+socket.on("changeTurn", () => {
   toggleTurn();
 });
 
@@ -309,7 +313,7 @@ const setGameDetails = async () => {
   const data = await fetchGameDetails();
   gameDetails = data;
 
-  if (!data) {
+  if (!gameDetails) {
     return;
   }
 
@@ -354,17 +358,11 @@ const startTimer = () => {
         timeRemaining--;
         updateTimerDisplay();
       } else {
-        toggleTurn();
         clearInterval(timerInterval);
-        alert("Time's up!");
+        socket.emit("goChangeTurn");
       }
     }, 1000);
   }
-};
-
-const pauseTimer = () => {
-  clearInterval(timerInterval);
-  isPaused = true;
 };
 
 const resetTimer = () => {
@@ -385,5 +383,12 @@ window.onload = () => {
   updateTimerDisplay();
   playerName.textContent = user.username;
   loadMessages();
-  setGameDetails();
+  setGameDetails().then((r) => {
+    if (r.status === "in progress") {
+      startTimer();
+      showTheWord(r?.currentWord);
+    }
+  });
 };
+
+console.log(isPlaying);

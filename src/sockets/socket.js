@@ -20,6 +20,10 @@ const socketSetup = (server) => {
       io.emit("receiveMessage", data);
     });
 
+    socket.on("goChangeTurn", (data) => {
+      io.emit("changeTurn", data);
+    });
+
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
     });
