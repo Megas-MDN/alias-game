@@ -53,24 +53,6 @@ const findUserById = async (user_id) => {
     return find;
 };
 
-//new
-const updateUserStats = async (userId) => {
-    const user = await userModel.findById(userId);
-    if (user) {
-        user.gamesPlayed += 1;
-        user.gamesWon += 1;
-        await user.save();
-    }
-    console.log(`desde user model jugados ${user.gamesPlayed}, ganados ${user.gamesWon}`);
-}
-
-const updateUserCurrentGameAndTeam = async (userId) => {
-    await userModel.findByIdAndUpdate(userId, {
-        currentGame: null,
-        team: null
-    });
-}
-
 module.exports = {
     createUser,
     getAllUsers,
@@ -78,8 +60,6 @@ module.exports = {
     updateUserField,
     deleteUser,
     findUserByUsername,
-    findUserById,
-    updateUserStats,
-    updateUserCurrentGameAndTeam
+    findUserById
 }
 
