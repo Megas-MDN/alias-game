@@ -1,5 +1,4 @@
 const ChatModel = require("../models/chatModel");
-const io = require("./socketService");
 //new
 const WordService = require("./wordService");
 const GameService = require("./gameService");

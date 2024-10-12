@@ -7,6 +7,7 @@ const messageInput = document.getElementById("messageInput");
 const guessInput = document.getElementById("guessInput");
 const status = document.getElementById("status");
 const round = document.getElementById("round");
+const timerElement = document.getElementById("timer");
 
 const socket = io("/");
 let user = null;
@@ -14,6 +15,7 @@ let game = null;
 let gameDetails = null;
 let isUserDescribe = false;
 let isPlaying = true;
+const TIMER_IN_SECONDS = 10;
 
 document.getElementById("backBtn").onclick = () => {
   window.location.href = "/";
@@ -122,7 +124,34 @@ socket.on("receiveMessage", (data) => {
   }
 });
 
-const fetchGameMessages = async (gameId, teamId) => {
+const toggleTurn = async () => {
+  await fetchChangeTurn();
+  await setGameDetails();
+  updateTimerDisplay();
+  startTimer();
+};
+
+const showTheWord = (theWord) => {
+  const wordToGuess = document.getElementById("wordToGuess");
+  if (isUserDescribe) {
+    return (wordToGuess.innerHTML = `Describe the word: ${theWord}`);
+  }
+  wordToGuess.innerHTML = "";
+};
+
+socket.on("startGame", (data) => {
+  console.log("Game Started", data, "<<< Games");
+  startTimer();
+  setGameDetails().then((r) => {
+    showTheWord(r?.currentWord);
+  });
+});
+
+socket.on("hitTheWord", (data) => {
+  toggleTurn();
+});
+
+const fetchGameMessages = async (gameId) => {
   const response = await fetch(`/api/chats?gameId=${gameId}&order=1`, {
     method: "GET",
     headers: {
@@ -169,10 +198,12 @@ const fetchGameDetails = async () => {
       currentRound: data?.currentRound,
     };
     setInLocalStorage("gameDetails", gameDetails);
-    return gameDetails;
+    return { ...data, ...gameDetails };
   }
   return data;
 };
+
+const fetchChangeTurn = async () => {};
 
 const setDescriberInputs = () => {
   isUserDescribe = true;
@@ -292,12 +323,55 @@ const setGameDetails = async () => {
 
   if (user.id === data.userIdDescriber) {
     setPlaying();
-    return setDescriberInputs();
+    setDescriberInputs();
+    return data;
   }
   if (game.teamId !== data.teamIdTurn) {
-    return setNonPlaying();
+    setNonPlaying();
+    return data;
   }
-  return setPlaying();
+  setPlaying();
+  return data;
+};
+
+let timerInterval;
+let timeRemaining = TIMER_IN_SECONDS;
+let isPaused = true;
+
+const updateTimerDisplay = () => {
+  const minutes = Math.floor(timeRemaining / 60);
+  const seconds = timeRemaining % 60;
+  timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
+};
+
+const startTimer = () => {
+  if (isPaused) {
+    isPaused = false;
+    timerInterval = setInterval(() => {
+      if (timeRemaining > 0) {
+        timeRemaining--;
+        updateTimerDisplay();
+      } else {
+        toggleTurn();
+        clearInterval(timerInterval);
+        alert("Time's up!");
+      }
+    }, 1000);
+  }
+};
+
+const pauseTimer = () => {
+  clearInterval(timerInterval);
+  isPaused = true;
+};
+
+const resetTimer = () => {
+  clearInterval(timerInterval);
+  timeRemaining = TIMER_IN_SECONDS;
+  isPaused = true;
+  updateTimerDisplay();
 };
 
 window.onload = () => {
@@ -308,6 +382,7 @@ window.onload = () => {
     window.location.replace("/login.html");
     return;
   }
+  updateTimerDisplay();
   playerName.textContent = user.username;
   loadMessages();
   setGameDetails();

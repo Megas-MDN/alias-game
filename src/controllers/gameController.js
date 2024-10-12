@@ -2,6 +2,7 @@ const Game = require("../models/gameModel");
 const User = require("../models/userModel");
 
 const gameService = require("../services/gameService");
+const io = require("../services/socketService");
 
 //Game CRUD
 const createGame = async (req, res) => {
@@ -81,7 +82,7 @@ const deleteGameById = async (req, res) => {
 //join a game - finished
 const joinGame = async (req, res) => {
   const { userId } = req.body;
-  console.log("Body", req.body, "<<< Body");
+
   try {
     // find a game that is waiting for players
     let game = await Game.findOne({ status: "waiting" }).populate("teams");
@@ -90,9 +91,10 @@ const joinGame = async (req, res) => {
       game = await gameService.createGame(userId);
 
       return res.status(201).json({
-        message: "You're the first player to join. A new game has been created.",
+        message:
+          "You're the first player to join. A new game has been created.",
         gameId: game._id,
-        teamId: game.teams[0]._id,  
+        teamId: game.teams[0]._id,
       });
     }
 
@@ -147,6 +149,7 @@ const joinGame = async (req, res) => {
     if (teams[0].players.length === 4 && teams[1].players.length === 4) {
       game.status = "in progress";
       await game.save();
+      io.emit("startGame", game);
     }
 
     return res.status(200).json({
@@ -211,5 +214,5 @@ module.exports = {
   deleteGameById,
   endTurn,
   playGame,
-  getAllGames
+  getAllGames,
 };
