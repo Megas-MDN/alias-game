@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const userModel = require("../../../models/userModel");
 const teamModel = require("../../../models/teamModel");
+const inmemoryUserController = require("../../../controllers/in-memory/in-memory-userController");
 const inmemoryAuthController = require("../../../controllers/in-memory/in-memory-authController");
 const inMemoryTeamController = require("../../../controllers/in-memory/in-memory-teamController");
 
@@ -26,12 +27,12 @@ describe("Update Specific Team Field (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 4",
             password: "1133"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "1133"
         });
@@ -60,12 +61,12 @@ describe("Update Specific Team Field (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 9",
             password: "4444"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "4444"
         });
@@ -94,12 +95,12 @@ describe("Update Specific Team Field (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 7",
             password: "1166"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "1166"
         });
@@ -130,12 +131,12 @@ describe("Update Specific Team Field (Unit Test)", () => {
 
         await mongoose.connect(MONGO_URl);
 
-        const user = await inmemoryAuthController.registerUser({
+        const user = await inmemoryUserController.createUserController({
             username: "User 1",
             password: "7788"
         });
 
-        const loginUser = await inmemoryAuthController.loginUser({
+        const loginUser = await inmemoryAuthController.loginUserController({
             username: user.res.username,
             password: "7788"
         });

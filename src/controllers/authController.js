@@ -9,7 +9,7 @@ const createAdminController = async (req, res) => {
 
       const existingUser = await User.findOne({ username });
       if (existingUser) {
-          return res.status(400).json({ message: 'User already exists' });
+          return res.status(401).json({ message: 'User already exists' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -37,7 +37,7 @@ const createAdminController = async (req, res) => {
           currentGame: newAdmin.currentGame,
           team: newAdmin.team,
           role: newAdmin.role,
-          token: token
+          adminToken: token
       });
 
   } catch (error) {

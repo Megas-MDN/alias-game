@@ -1,6 +1,6 @@
 const { createHmacSHA256Signature } = require("../../utils/jwt");
 
-async function InMemoryAuthenticateToken(token)  {
+const inMemoryAuthenticateToken = async (token) => {
     
     const [headerBase64, payloadBase64, providedSignature] = token.split('.');
 
@@ -15,4 +15,4 @@ async function InMemoryAuthenticateToken(token)  {
     return checkIsValidUser;
 };
 
-module.exports = InMemoryAuthenticateToken;
+module.exports = inMemoryAuthenticateToken;

@@ -5,38 +5,30 @@ const userService = require("../services/userService");
 const createUserController = async (req, res) => {
     const { username, password } = req.body;
 
-    try {
-        // Check if user exists
-        const existingUser = await userService.findUserByUsername(username);
+    const existingUser = await userService.findUserByUsername(username);
 
-        if (existingUser) {
-            return res.status(400).json({ message: "User already exists" });
-        }
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create a new user
-        const user = await userService.createUser({
-            username,
-            password: hashedPassword
-        });
-
-        return res.status(201).json({
-            message: "User registered",
-            user: {
-                username: user.username,
-                gamesPlayed: user.gamesPlayed,
-                gamesWon: user.gamesWon,
-                _id: user._id,
-                __v: user.__v
-            }
-        });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server error" });
+    if (existingUser) {
+        return res.status(401).json({ message: "User already exists" });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await userService.createUser({
+        username,
+        password: hashedPassword
+    });
+
+    return res.status(201).json({
+        message: "User registered",
+        user: {
+            username: user.username,
+            gamesPlayed: user.gamesPlayed,
+            gamesWon: user.gamesWon,
+            _id: user._id,
+            __v: user.__v
+        }
+    });
+    
 };
 
 const getSpecificUserController = async (req, res) => {
