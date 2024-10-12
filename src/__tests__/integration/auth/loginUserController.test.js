@@ -41,6 +41,86 @@ describe("Login User Controller", () => {
         await mongoose.connection.close();
     });
 
+    it("shouldn't be able to to login a user, if the 'username' field dosen't have a value", async () => {
+
+        await mongoose.connect(MONGO_URl);
+
+        await request(app).post("/api/users/createUser").send({
+            username: "User 8",
+            password: "3366"
+        });
+
+        const login = await request(app).post("/api/auth/login").send({
+            username: "",
+            password: "3366"
+        });
+
+        expect(login.body).toStrictEqual({ message: "The fields must have a value !" });
+        expect(login.status).toBe(401);
+
+        await mongoose.connection.close();
+    });
+
+    it("shouldn't be able to login a user, if the 'password' field dosen't have a value", async () => {
+
+        await mongoose.connect(MONGO_URl);
+
+        const user = await request(app).post("/api/users/createUser").send({
+            username: "User 4",
+            password: "9999"
+        });
+
+        const login = await request(app).post("/api/auth/login").send({
+            username: user.body.user.username,
+            password: ""
+        });
+
+        expect(login.body).toStrictEqual({ message: "The fields must have a value !" });
+        expect(login.status).toBe(401);
+
+        await mongoose.connection.close();
+    });
+
+    it("shouldn't be able to login a user, if the 'username' field isn't a string", async () => {
+
+        await mongoose.connect(MONGO_URl);
+
+        await request(app).post("/api/users/createUser").send({
+            username: "User 42",
+            password: "1111"
+        });
+
+        const login = await request(app).post("/api/auth/login").send({
+            username: 7788,
+            password: "1111"
+        });
+
+        expect(login.body).toStrictEqual({ message: "The fileds must be a string !" });
+        expect(login.status).toBe(401);
+
+        await mongoose.connection.close();
+    });
+
+    it("shouldn't be able to to login a user, if the 'password' field isn't a string", async () => {
+
+        await mongoose.connect(MONGO_URl);
+
+        const user = await request(app).post("/api/users/createUser").send({
+            username: "User 22",
+            password: "8888"
+        });
+
+        const login = await request(app).post("/api/auth/login").send({
+            username: user.body.user.username,
+            password: 8888
+        });
+
+        expect(login.body).toStrictEqual({ message: "The fileds must be a string !" });
+        expect(login.status).toBe(401);
+
+        await mongoose.connection.close();
+    });
+
     it("shouldn't be able to login a user, if the 'username' field is wrong", async () => {
 
         await mongoose.connect(MONGO_URl);
