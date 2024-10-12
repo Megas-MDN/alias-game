@@ -1,10 +1,9 @@
 const ChatModel = require("../models/chatModel");
-
-//new 
+const io = require("./socketService");
+//new
 const WordService = require("./wordService");
 const GameService = require("./gameService");
 const TeamService = require("./teamService");
- 
 
 const listAllChats = async (query = {}) => {
   const filters = {
@@ -19,7 +18,7 @@ const listAllChats = async (query = {}) => {
       select: "username",
     })
     .select("-__v ")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: query.order ? 1 : -1 });
 
   return chats;
 };
@@ -68,20 +67,19 @@ const createChat = async (data = {}) => {
 const handleGuessMessage = async (chatMessage) => {
   const { gameId, teamId, message, messageType } = chatMessage;
 
-  if (messageType === 'guess') {
-    const correctWord = await GameService.getCurrentWord(gameId); 
+  if (messageType === "guess") {
+    const correctWord = await GameService.getCurrentWord(gameId);
     const wordService = new WordService();
     const points = await wordService.checkUserGuess(correctWord, message);
     if (points > 0) {
-        //update team points
-        await TeamService.updateTeamPoints(teamId, points);
-        console.log(`Team ${teamId} receives ${points} points!`);
+      //update team points
+      await TeamService.updateTeamPoints(teamId, points);
+      console.log(`Team ${teamId} receives ${points} points!`);
     } else {
-        console.log(`No points awarded for team ${teamId}.`);
+      console.log(`No points awarded for team ${teamId}.`);
     }
   }
-}
-
+};
 
 module.exports = {
   listAllChats,

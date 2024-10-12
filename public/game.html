@@ -30,7 +30,13 @@
             d="M15 12H3m0 0l6-6m-6 6l6 6" />
         </svg>
       </button>
-      <h1 class="text-2xl font-bold">Alias Game</h1>
+      <div class="flex items-end space-x-4 ">
+        <h1 class="text-2xl font-bold">Alias Game</h1>
+        <h3 class="text-md "
+          id="status"></h3>
+        <h3 class="text-md "
+          id="round"></h3>
+      </div>
     </div>
     <div class="flex items-center space-x-4">
       <span class="text-lg"
@@ -52,7 +58,8 @@
     </ul>
 
     <!-- Message Inputs -->
-    <div class="flex w-full space-x-2">
+    <div class="flex w-full space-x-2"
+      id="messageContainer">
       <div class="flex-1">
         <input type="text"
           id="messageInput"

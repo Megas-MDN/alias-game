@@ -1,8 +1,14 @@
-const { Server } = require("socket.io");
 const chatService = require("../services/chatService");
 
-module.exports = (server) => {
-  const io = new Server(server);
+let io = {};
+
+const socketSetup = (server) => {
+  io = require("socket.io")(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+  });
 
   io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
@@ -19,3 +25,12 @@ module.exports = (server) => {
     });
   });
 };
+
+const getIO = () => {
+  if (!io) {
+    throw new Error("Socket.io is not initialized!");
+  }
+  return io;
+};
+
+module.exports = { socketSetup, getIO };
