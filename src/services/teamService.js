@@ -49,6 +49,12 @@ const updateTeamPoints = async (teamId, points) => {
       await team.save(); 
     }
 }
+
+//new 
+const getUsersByTeamId = async (teamId) => {
+    const team = await teamModel.findById(teamId).populate('players'); 
+    return team ? team.players : [];
+};
   
 module.exports = { 
     createTeamService, 
@@ -57,5 +63,6 @@ module.exports = {
     updateSpecificTeamField,
     deleteTeam,
     findUserByid,
-    updateTeamPoints
+    updateTeamPoints,
+    getUsersByTeamId,
 };
