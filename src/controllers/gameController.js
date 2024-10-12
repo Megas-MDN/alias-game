@@ -84,6 +84,26 @@ const joinGame = async (req, res) => {
   const { userId } = req.body;
 
   try {
+    //check if the player is already in another game in progress
+    const allGames = await Game.find({ status: "in progress" }).populate(
+      "teams",
+    );
+    const otherGameInProgress = allGames.find(
+      (game) =>
+        game.status === "in progress" &&
+        game.teams.some((team) => team.players.includes(userId)),
+    );
+
+    if (otherGameInProgress) {
+      return res.status(400).json({
+        message: "Player is already in another game in progress",
+        gameId: otherGameInProgress._id,
+        teamId: otherGameInProgress.teams.find((team) =>
+          team.players.includes(userId),
+        )?._id,
+      });
+    }
+
     // find a game that is waiting for players
     let game = await Game.findOne({ status: "waiting" }).populate("teams");
     if (!game) {
@@ -112,22 +132,6 @@ const joinGame = async (req, res) => {
         message: "Player is already in a team in this game",
         gameId: game._id,
         teamId: teams.find((team) => team.players.includes(userId))?._id,
-      });
-    }
-
-    //check if the player is already in another game in progress
-    const otherGameInProgress = await Game.findOne({
-      status: "in progress",
-      "teams.players": userId,
-    });
-
-    if (otherGameInProgress) {
-      return res.status(400).json({
-        message: "Player is already in another game in progress",
-        gameId: otherGameInProgress._id,
-        teamId: otherGameInProgress.teams.find((team) =>
-          team.players.includes(userId),
-        )?._id,
       });
     }
 
