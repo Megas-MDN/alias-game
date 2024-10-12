@@ -61,7 +61,7 @@ const updateUserStats = async (userId) => {
         user.gamesWon += 1;
         await user.save();
     }
-    console.log(`desde user model jugados ${user.gamesPlayed}, ganados ${user.gamesWon}`);
+    console.log(`from user model ${user.gamesPlayed}, ganados ${user.gamesWon}`);
 }
 
 const updateUserCurrentGameAndTeam = async (userId) => {
