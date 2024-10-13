@@ -78,15 +78,6 @@ class GameService {
         return game;
     }
 
-    async getCurrentTurnInfo(gameId) {
-        const game = await this.verifyGameProgress(gameId);
-
-        const currentTeamId = game.currentTurnTeam;
-        const currentDescriberId = game.currentDescriber;
-
-        return { currentTeamId, currentDescriberId, currentWord: game.currentWord };
-    }
-
     async nextTurn(gameId) {
         const game = await Game.findById(gameId).populate('teams');
         
@@ -115,10 +106,12 @@ class GameService {
             }
 
             // If they played all rounds, the game is completed
-            if (game.currentRound > game.rounds) {
+            if (game.currentRound === game.rounds) {
                 game.status = 'finished';
+                await game.save();
                 console.log('Game finished!');
-                await this.determineWinner(gameId);
+                const result = await this.determineWinner(gameId);
+                return result;
 
             }else{
                 const currentTeam = game.teams.find(t => t._id.toString() === game.currentTurnTeam.toString());
@@ -151,7 +144,6 @@ class GameService {
         return game.currentWord;
     }
 
-    //new 
     async determineWinner(gameId) {
         try{
             const game = await Game.findById(gameId).populate('teams'); 
@@ -175,9 +167,8 @@ class GameService {
                 } else if (pointsTeam2 > pointsTeam1) {
                     winnerTeam = game.teams[1];
                 }else{
-                    //if it's a tie, no one wins, return null
                     console.log('The game is a tie!');
-                    return winnerTeam;
+                    return { isTie: true, message: "It's a tie!" };
                 }
 
                 //update user stats
@@ -185,6 +176,8 @@ class GameService {
                 await this.updateUserGameStats(winnerTeam._id);
                 //update user current game and team
                 await this.updateCurrentGameAndTeam(winnerTeam._id);
+
+                return { isTie: false, winnerTeam };
 
             }else{
                 throw new Error('Game is not finished yet');
@@ -234,18 +227,6 @@ class GameService {
             }
         }
     }
-
-    //new
-    async changeGameStatus(gameId, status){
-        const game = await Game.findById(gameId);
-        if (!game) {
-            throw new Error('Game not found');
-        }
-        game.status = status;
-        await game.save();
-        return game;
-    }
-
 }
 
 module.exports = new GameService();

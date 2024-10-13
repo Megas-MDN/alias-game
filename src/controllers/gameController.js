@@ -65,21 +65,10 @@ const deleteGameById = async (req, res) => {
   return res.status(200).json({ message: "Game Deleted with sucess !" });
 };
 
-//new 
-const changeGameStatus = async (req, res) => {
-  const { gameId, status } = req.body;
-  try {
-    await gameService.changeGameStatus(gameId, status);
-
-  }catch(error){
-    console.error("Error changing game status:", error);
-    return res.status(500).json({ error: "Failed to change game status" });
-  }
-}
 
 //Game logic
 
-//join a game - finished
+//join a game 
 const joinGame = async (req, res) => {
   const { userId } = req.body;
   console.log("Body", req.body, "<<< Body");
@@ -146,6 +135,7 @@ const joinGame = async (req, res) => {
 
     //Change game status to 'in progress' if both teams have 4 players
     if (teams[0].players.length === 4 && teams[1].players.length === 4) {
+      console.log("Both teams have 4 players. Game in progress");
       game.status = "in progress";
       await game.save();
     }
@@ -161,20 +151,36 @@ const joinGame = async (req, res) => {
   }
 };
 
-//end turn - finished
+//end turn 
 const endTurn = async (req, res) => {
   try {
     const { gameId } = req.params;
-    const game = await gameService.nextTurn(gameId);
+    const result = await gameService.nextTurn(gameId);
 
-    if (game.status === "finished") {
-      res.json({ message: "Game completed", game });
-    } else {
-      res.json({
-        message: "Turn ended, next team's turn and describer updated",
-        game,
+    console.log("Result:", result);
+    if (result.isTie) {
+      return res.json({
+        message: "The game ended in a tie.",
+        game: result, // Puedes incluir información adicional aquí
       });
     }
+
+     // Verificar si el juego ha terminado con un ganador
+     if (result.winnerTeam) {
+      return res.json({
+        message: "Game completed, we have a winner!",
+        winner: result.winnerTeam, // Información del equipo ganador
+      });
+    }
+
+    // Si el juego sigue en progreso, devolver el estado actualizado
+    if (result.status === "in progress") {
+      return res.json({
+        message: "Turn ended, next team's turn and describer updated",
+        game: result
+      });
+    }
+
   } catch (error) {
     console.error("Error ending turn:", error);
     res
@@ -183,39 +189,6 @@ const endTurn = async (req, res) => {
   }
 };
 
-// Fuction to manage the game - IN PROGRESS
-const playGame = async (req, res) => {
-  try {
-    const { gameId } = req.params;
-    //const game = await gameService.verifyGameProgress(gameId);
-
-    const { currentTeamId, currentDescriberId, currentWord } =
-      await gameService.getCurrentTurnInfo(gameId);
-
-    res.status(200).json({
-      message: "Game in progress",
-      currentTeamId,
-      currentDescriberId,
-      currentWord,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error playing game:", error: error.message });
-  }
-};
-
-//new
-const determineWinner = async (req, res) => {
-  const { gameId } = req.params;
-  try {
-    const game = await gameService.determineWinner(gameId);
-    res.json({ message: "Winner determined", game });
-  } catch (error) {
-    console.error("Error determining winner:", error);
-    res.status(500).json({ message: "Error determining winner" });
-  }
-}
 
 module.exports = {
   createGame,
@@ -223,8 +196,5 @@ module.exports = {
   getGameById,
   deleteGameById,
   endTurn,
-  playGame,
   getAllGames,
-  changeGameStatus,
-  determineWinner,
 };

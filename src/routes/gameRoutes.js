@@ -10,11 +10,8 @@ router.get('/', authenticateToken, isAdmin, gameController.getAllGames);
 router.delete('/:gameId', authenticateToken, isAdmin, gameController.deleteGameById); 
 
 //to play the game  
-router.post('/join', authenticateToken, gameController.joinGame); //finished 
-router.post('/:gameId/play', gameController.playGame); 
-router.post('/:gameId/endTurn', gameController.endTurn); //in progress
-router.post('/:gameId/winner', gameController.determineWinner); //in progress
-
+router.post('/join', authenticateToken, gameController.joinGame); 
+router.post('/:gameId/endTurn', authenticateToken, isAdmin, gameController.endTurn); 
 
 
 
