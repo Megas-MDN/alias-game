@@ -36,6 +36,66 @@ describe("Create User Controller", () => {
         await mongoose.connection.close();
     });
 
+    it("shouldn't be able to create a user if the 'username' field dosen't have a value", async () => {
+
+        await mongoose.connect(MONGO_URl);
+
+        const user = await request(app).post("/api/users/createUser").send({
+            username: "",
+            password: "3366"
+        });
+
+        expect(user.body).toStrictEqual({ message: "The fields must have a value !" });
+        expect(user.status).toBe(401);
+
+        await mongoose.connection.close();
+    });
+
+    it("shouldn't be able to create a user, if the 'password' field dosen't have a value", async () => {
+
+        await mongoose.connect(MONGO_URl);
+
+        const user = await request(app).post("/api/users/createUser").send({
+            username: "User 4",
+            password: ""
+        });
+
+        expect(user.body).toStrictEqual({ message: "The fields must have a value !" });
+        expect(user.status).toBe(401);
+
+        await mongoose.connection.close();
+    });
+
+    it("shouldn't be able to create a user, if the 'username' field isn't a string", async () => {
+
+        await mongoose.connect(MONGO_URl);
+
+        const user = await request(app).post("/api/users/createUser").send({
+            username: 88,
+            password: "1111"
+        });
+
+        expect(user.body).toStrictEqual({ message: "The fileds must be a string !" });
+        expect(user.status).toBe(401);
+
+        await mongoose.connection.close();
+    });
+
+    it("shouldn't be able to create a user 'admin', if the 'password' field isn't a string", async () => {
+
+        await mongoose.connect(MONGO_URl);
+
+        const user = await request(app).post("/api/users/createUser").send({
+            username: "User 22",
+            password: 8888
+        });
+
+        expect(user.body).toStrictEqual({ message: "The fileds must be a string !" });
+        expect(user.status).toBe(401);
+
+        await mongoose.connection.close();
+    });
+
     it("shouldn't be able to create a User, if user already exists", async () => {
 
         await mongoose.connect(MONGO_URl);

@@ -77,6 +77,17 @@ const deleteGameById = async (req, res) => {
   }
 };
 
+//new
+const changeGameStatus = async (req, res) => {
+  const { gameId, status } = req.body;
+  try {
+    await gameService.changeGameStatus(gameId, status);
+  } catch (error) {
+    console.error("Error changing game status:", error);
+    return res.status(500).json({ error: "Failed to change game status" });
+  }
+};
+
 //Game logic
 
 //join a game - finished
@@ -213,6 +224,18 @@ const playGame = async (req, res) => {
   }
 };
 
+//new
+const determineWinner = async (req, res) => {
+  const { gameId } = req.params;
+  try {
+    const game = await gameService.determineWinner(gameId);
+    res.json({ message: "Winner determined", game });
+  } catch (error) {
+    console.error("Error determining winner:", error);
+    res.status(500).json({ message: "Error determining winner" });
+  }
+};
+
 module.exports = {
   createGame,
   joinGame,
@@ -221,4 +244,6 @@ module.exports = {
   endTurn,
   playGame,
   getAllGames,
+  changeGameStatus,
+  determineWinner,
 };
