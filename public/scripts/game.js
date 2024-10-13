@@ -147,12 +147,24 @@ socket.on("startGame", () => {
   });
 });
 
-socket.on("hitTheWord", () => {
-  toggleTurn();
+socket.on("hitTheWord", (data) => {
+  if (data.gameId === game.gameId) toggleTurn();
 });
 
-socket.on("changeTurn", () => {
-  toggleTurn();
+socket.on("changeTurn", (data) => {
+  if (data.gameId === game.gameId) toggleTurn();
+});
+
+socket.on("endGame", (data) => {
+  if (data.gameId === game.gameId) {
+    console.log("endGame", data);
+  }
+});
+
+socket.on("turnChanged", (data) => {
+  if (data.gameId === game.gameId) {
+    console.log("turnChanged", data);
+  }
 });
 
 const fetchGameMessages = async (gameId) => {
@@ -207,7 +219,9 @@ const fetchGameDetails = async () => {
   return data;
 };
 
-const fetchChangeTurn = async () => {};
+const fetchChangeTurn = async () => {
+  // POST /api/games/:gameId/endTurn
+};
 
 const setDescriberInputs = () => {
   isUserDescribe = true;
@@ -359,7 +373,7 @@ const startTimer = () => {
         updateTimerDisplay();
       } else {
         clearInterval(timerInterval);
-        socket.emit("goChangeTurn");
+        socket.emit("goChangeTurn", { gameId: game.gameId });
       }
     }, 1000);
   }

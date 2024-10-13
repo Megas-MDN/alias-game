@@ -174,8 +174,10 @@ const endTurn = async (req, res) => {
     const game = await gameService.nextTurn(gameId);
 
     if (game.status === "completed") {
+      io.emit("endGame", { ...game, gameId: game._id });
       res.json({ message: "Game completed", game });
     } else {
+      io.emit("turnChanged", { ...game, gameId: game._id });
       res.json({
         message: "Turn ended, next team's turn and describer updated",
         game,
