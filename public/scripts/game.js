@@ -87,7 +87,14 @@ document
 const createNewLine = (data) => {
   const newMessage = document.createElement("li");
 
-  newMessage.classList.add("text-gray-700", "p-2", "rounded-md", "mb-2");
+  newMessage.classList.add(
+    "text-gray-700",
+    "p-2",
+    "rounded-md",
+    "mb-2",
+    "flex",
+    "justify-between",
+  );
 
   if (data.messageType === "guess") {
     newMessage.classList.add(
@@ -109,8 +116,10 @@ const createNewLine = (data) => {
     newMessage.classList.add("bg-gray-100", "bg-opacity-50");
   }
 
-  newMessage.innerHTML = `<strong>${data.username || data.userId}:</strong> ${
-    data.message
+  newMessage.innerHTML = `<p><strong>${
+    data.username || data.userId
+  }:</strong> ${data.message}</p>${
+    data.points ? `<em class="ml-auto">+${data.points} points</em>` : ""
   }`;
 
   messagesList.appendChild(newMessage);
@@ -137,6 +146,9 @@ const showTheWord = (theWord) => {
 socket.on("receiveMessage", (data) => {
   if (data.gameId === game.gameId) {
     createNewLine(data);
+    if (data.points && data.userId === user.id) {
+      toggleTurn();
+    }
   }
 });
 

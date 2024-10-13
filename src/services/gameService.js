@@ -88,11 +88,14 @@ class GameService {
         game.currentRound++;
       }
 
-      // If they played all rounds, the game is completed
-      if (game.currentRound > game.rounds) {
+      // If they played all rounds, the game is completed // game.rounds
+      if (game.currentRound > 0) {
         game.status = "finished";
+        await game.save();
         console.log("Game finished!");
-        await this.determineWinner(gameId);
+        const teamWinner = await this.determineWinner(gameId);
+        const gameToSend = game.toObject();
+        return { ...gameToSend, teamWinner };
       } else {
         const currentTeam = game.teams.find(
           (t) => t._id.toString() === game.currentTurnTeam.toString(),
@@ -149,7 +152,7 @@ class GameService {
         console.log(`Team 1: ${pointsTeam1} points`);
         console.log(`Team 2: ${pointsTeam2} points`);
 
-        let winnerTeam = null;
+        let winnerTeam = { teamName: null, _id: null };
 
         if (pointsTeam1 > pointsTeam2) {
           winnerTeam = game.teams[0];
@@ -166,6 +169,7 @@ class GameService {
         await this.updateUserGameStats(winnerTeam._id);
         //update user current game and team
         await this.updateCurrentGameAndTeam(winnerTeam._id);
+        return winnerTeam;
       } else {
         throw new Error("Game is not finished yet");
       }
@@ -211,6 +215,8 @@ class GameService {
       } else {
         console.log(`No points awarded for team ${teamId}.`);
       }
+
+      return points;
     }
   }
 
