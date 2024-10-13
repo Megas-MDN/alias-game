@@ -1,7 +1,7 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 const http = require("http");
-const socketSetup = require("../src/sockets/socket");
+const { socketSetup, getIO } = require("../src/sockets/socket");
 
 const PORT = process.env.PORT || 3001;
 const MONGO_URI = process.env.MONGO_URI;
@@ -21,3 +21,5 @@ mongoose
   .catch((err) => {
     console.error("Error connecting to MongoDB:", err);
   });
+
+module.exports = { getIO };

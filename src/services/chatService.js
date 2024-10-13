@@ -1,8 +1,7 @@
 const ChatModel = require("../models/chatModel");
-
-//new 
+//new
 const GameService = require("./gameService");
- 
+
 const listAllChats = async (query = {}) => {
   const filters = {
     ...(query.gameId && { gameId: query.gameId }),
@@ -16,7 +15,7 @@ const listAllChats = async (query = {}) => {
       select: "username",
     })
     .select("-__v ")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: query.order ? 1 : -1 });
 
   return chats;
 };
@@ -58,6 +57,7 @@ const createChat = async (data = {}) => {
     messageType: data.messageType || "guess",
   };
   const chat = await ChatModel.create(newChat);
+  await handleGuessMessage(data);
   return chat;
 };
 
@@ -65,11 +65,10 @@ const createChat = async (data = {}) => {
 const handleGuessMessage = async (chatMessage) => {
   const { messageType } = chatMessage;
 
-  if (messageType === 'guess') {
+  if (messageType === "guess") {
     await GameService.processGuess(chatMessage);
   }
-}
-
+};
 
 module.exports = {
   listAllChats,
