@@ -15,8 +15,6 @@ router.post('/:gameId/play', gameController.playGame);
 router.post('/:gameId/endTurn', gameController.endTurn); //in progress
 router.post('/:gameId/winner', gameController.determineWinner); //in progress
 
-//new
-router.post('/change', gameController.changeGameStatus);
 
 
 

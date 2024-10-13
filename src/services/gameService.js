@@ -175,9 +175,9 @@ class GameService {
                 } else if (pointsTeam2 > pointsTeam1) {
                     winnerTeam = game.teams[1];
                 }else{
+                    //if it's a tie, no one wins, return null
                     console.log('The game is a tie!');
                     return winnerTeam;
-                    // who is the winner (?)
                 }
 
                 //update user stats
