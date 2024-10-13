@@ -34,6 +34,11 @@ class GameService {
         });
     };
 
+    async getAllGames() {
+        const find = await Game.find();
+        return find;
+    };
+
     async createGame(firstPlayerId) {
         if (!firstPlayerId) {
             throw new Error('firstPlayerId is required to create a game');

@@ -34,7 +34,7 @@ const getGameById = async (req, res) => {
     if (!game) {
       return res.status(404).json({ message: "Game not found" });
     }
-    
+
     res.json(game);
   } catch (error) {
     console.error("Error fetching game:", error);
@@ -44,8 +44,8 @@ const getGameById = async (req, res) => {
 
 const getAllGames = async (req, res) => {
   try {
-    const games = await Game.find().populate("teams");
-    res.json(games);
+    const games = await gameService.getAllGames();
+    return res.status(200).json(games);
   } catch (error) {
     console.error("Error fetching games:", error);
     res.status(500).json({ message: "Error fetching games" });
