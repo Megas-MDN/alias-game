@@ -15,7 +15,7 @@ let game = null;
 let gameDetails = null;
 let isUserDescribe = false;
 let isPlaying = true;
-const TIMER_IN_SECONDS = 10;
+const TIMER_IN_SECONDS = 600;
 
 document.getElementById("backBtn").onclick = () => {
   window.location.href = "/";
@@ -118,14 +118,9 @@ const createNewLine = (data) => {
   messagesList.scrollTop = messagesList.scrollHeight;
 };
 
-socket.on("receiveMessage", (data) => {
-  if (data.gameId === game.gameId) {
-    createNewLine(data);
-  }
-});
-
 const toggleTurn = async () => {
   await fetchChangeTurn();
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   await setGameDetails();
   resetTimer();
   startTimer();
@@ -138,6 +133,12 @@ const showTheWord = (theWord) => {
   }
   wordToGuess.innerHTML = "";
 };
+
+socket.on("receiveMessage", (data) => {
+  if (data.gameId === game.gameId) {
+    createNewLine(data);
+  }
+});
 
 socket.on("startGame", () => {
   resetTimer();
@@ -221,6 +222,17 @@ const fetchGameDetails = async () => {
 
 const fetchChangeTurn = async () => {
   // POST /api/games/:gameId/endTurn
+  console.log(`/api/games/${game.gameId}/endTurn`);
+  const response = await fetch(`/api/games/${game.gameId}/endTurn`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem("token"))}`,
+    },
+  });
+  const data = await response.json();
+  console.log(data, "fetchChangeTurn");
+  return data;
 };
 
 const setDescriberInputs = () => {
@@ -325,6 +337,9 @@ const setStatus = (statusInfo) => {
 
 const setGameDetails = async () => {
   const data = await fetchGameDetails();
+  console.log("gameDetails", data);
+  console.log("user", user);
+  console.log("game", game);
   gameDetails = data;
 
   if (!gameDetails) {
@@ -344,6 +359,8 @@ const setGameDetails = async () => {
     setDescriberInputs();
     return data;
   }
+  isUserDescribe = false;
+  showTheWord("");
   if (game.teamId !== data.teamIdTurn) {
     setNonPlaying();
     return data;
@@ -400,7 +417,7 @@ window.onload = () => {
   setGameDetails().then((r) => {
     if (r.status === "in progress") {
       startTimer();
-      showTheWord(r?.currentWord);
+      if (isUserDescribe) showTheWord(r?.currentWord);
     }
   });
 };

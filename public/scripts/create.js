@@ -43,7 +43,7 @@ const fetchRegsister = async (username, password = "123") => {
   });
   const data = await response.json();
   if (data?.message === "User registered") {
-    await fetchLogin(username, password);
+    return await fetchLogin(username, password);
   }
   throw new Error(data?.message);
 };
