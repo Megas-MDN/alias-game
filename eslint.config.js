@@ -10,11 +10,13 @@ module.exports = [
         ...globals.browser,
         io: "readonly",
       },
-      rules: {
-        "no-unused-vars": ["error", { "argsIgnorePattern": "^next$" }]
-      },
     },
   },
-  pluginJs.configs.recommended,
+  {
+    ...pluginJs.configs.recommended,
+    rules: {
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^next$" }],
+    },
+  },
 ];
 
