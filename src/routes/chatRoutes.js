@@ -4,13 +4,54 @@ const { authenticateToken } = require("../middlewares/authMiddleware");
 
 const router = Router();
 
-router.get("/", controller.listAllChats);
-router.get("/:chatId", controller.getChatById);
-router.post("/", authenticateToken, controller.createChat);
-router.put("/:chatId", authenticateToken, controller.updateChat);
-router.delete("/:chatId", authenticateToken, controller.deleteChat);
+router.get("/", async (req, res, next) => {
+  try {
+    await controller.listAllChats(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
 
-//new 
-router.post('/message', controller.receiveGuessMessage);
+router.get("/:chatId", async (req, res, next) => {
+  try {
+    await controller.getChatById(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+router.post("/", authenticateToken, async (req, res, next) => {
+  try {
+    await controller.createChat(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+router.put("/:chatId", authenticateToken, async (req, res, next) => {
+  try {
+    await controller.updateChat(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+router.delete("/:chatId", authenticateToken, async (req, res, next) => {
+  try {
+    await controller.deleteChat(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+// new 
+router.post('/message', async (req, res, next) => {
+  try {
+    await controller.receiveGuessMessage(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
 
 module.exports = router;
+

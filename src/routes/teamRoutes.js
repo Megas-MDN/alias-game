@@ -4,10 +4,44 @@ const teamController = require("../controllers/teamController");
 
 const router = Router();
 
-router.post("/", authenticateToken, teamController.createTeamController);
-router.get("/searchTeam", authenticateToken, teamController.getSpecificTeamController);
-router.get("/getAllTeams", authenticateToken, teamController.getAllTeamsController);
-router.patch("/updateSpecificTeamField", authenticateToken, teamController.updateSpecificTeamFieldController);
-router.delete("/deleteTeam", authenticateToken, teamController.deleteTeamController);
+router.post("/", authenticateToken, async (req, res, next) => {
+  try {
+    await teamController.createTeamController(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+router.get("/searchTeam", authenticateToken, async (req, res, next) => {
+  try {
+    await teamController.getSpecificTeamController(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+router.get("/getAllTeams", authenticateToken, async (req, res, next) => {
+  try {
+    await teamController.getAllTeamsController(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+router.patch("/updateSpecificTeamField", authenticateToken, async (req, res, next) => {
+  try {
+    await teamController.updateSpecificTeamFieldController(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+router.delete("/deleteTeam", authenticateToken, async (req, res, next) => {
+  try {
+    await teamController.deleteTeamController(req, res);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
 
 module.exports = router;
