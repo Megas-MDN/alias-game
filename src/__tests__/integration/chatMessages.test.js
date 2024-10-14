@@ -90,10 +90,11 @@ describe("Chat messages", () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       __v: 0,
+      points: null,
     };
 
     GameService.processGuess.mockResolvedValue(null);
-    ChatModel.create.mockResolvedValue(mockChat);
+    ChatModel.create.mockResolvedValue({ _doc: mockChat });
     const response = await supertest(app)
       .post(BASE_PATH)
       .set({

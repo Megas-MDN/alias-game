@@ -58,18 +58,17 @@ const deleteGameById = async (req, res) => {
 
   const findGameById = await gameService.getSpecificGame(gameId);
 
-  if(!findGameById) {
-      return res.status(404).json({ message: "Game Not Found !" });
+  if (!findGameById) {
+    return res.status(404).json({ message: "Game Not Found !" });
   }
 
   await gameService.deleteGame(gameId);
   return res.status(200).json({ message: "Game Deleted with sucess !" });
 };
 
-
 //Game logic
 
-//join a game 
+//join a game
 const joinGame = async (req, res) => {
   const { userId } = req.body;
 
@@ -158,7 +157,7 @@ const joinGame = async (req, res) => {
   }
 };
 
-//end turn 
+//end turn
 const endTurn = async (req, res) => {
   try {
     const { gameId } = req.params;
@@ -166,14 +165,16 @@ const endTurn = async (req, res) => {
 
     console.log("Result:", result);
     if (result.isTie) {
+      io.emit("endGame", result);
       return res.json({
         message: "The game ended in a tie.",
         game: result, // Puedes incluir información adicional aquí
       });
     }
 
-     // Verificar si el juego ha terminado con un ganador
-     if (result.winnerTeam) {
+    // Verificar si el juego ha terminado con un ganador
+    if (result.winnerTeam) {
+      io.emit("endGame", result);
       return res.json({
         message: "Game completed, we have a winner!",
         winner: result.winnerTeam, // Información del equipo ganador
@@ -182,12 +183,12 @@ const endTurn = async (req, res) => {
 
     // Si el juego sigue en progreso, devolver el estado actualizado
     if (result.status === "in progress") {
+      io.emit("turnChanged", { ...result, gameId: result._id });
       return res.json({
         message: "Turn ended, next team's turn and describer updated",
-        game: result
+        game: result,
       });
     }
-
   } catch (error) {
     console.error("Error ending turn:", error);
     res
@@ -195,7 +196,6 @@ const endTurn = async (req, res) => {
       .json({ message: "Error ending turn", error: error.message });
   }
 };
-
 
 module.exports = {
   createGame,

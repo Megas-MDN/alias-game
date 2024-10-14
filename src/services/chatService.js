@@ -57,8 +57,9 @@ const createChat = async (data = {}) => {
     messageType: data.messageType || "guess",
   };
   const chat = await ChatModel.create(newChat);
-  await handleGuessMessage(data);
-  return chat;
+  const points = await handleGuessMessage(data);
+  const chatObj = { ...chat._doc, points };
+  return chatObj;
 };
 
 //new -
@@ -66,8 +67,9 @@ const handleGuessMessage = async (chatMessage) => {
   const { messageType } = chatMessage;
 
   if (messageType === "guess") {
-    await GameService.processGuess(chatMessage);
+    return await GameService.processGuess(chatMessage);
   }
+  return 0;
 };
 
 module.exports = {

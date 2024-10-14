@@ -14,10 +14,11 @@ const socketSetup = (server) => {
     console.log("A user connected:", socket.id);
 
     socket.on("sendMessage", async (data) => {
+      let chat = {};
       if (data.gameId && data.teamId && data.userId && data.message) {
-        await chatService.createChat(data);
+        chat = await chatService.createChat(data);
       }
-      io.emit("receiveMessage", data);
+      io.emit("receiveMessage", { ...chat, ...(data || {}) });
     });
 
     socket.on("goChangeTurn", (data) => {
