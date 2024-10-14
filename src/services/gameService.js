@@ -230,7 +230,9 @@ class GameService {
       } else {
         console.log(`No points awarded for team ${teamId}.`);
       }
+      return points;
     }
+    return 0;
   }
 }
 
