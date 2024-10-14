@@ -11,8 +11,7 @@ let user = null;
 let game = null;
 let gameDetails = null;
 let isUserDescribe = false;
-let isPlaying = true;
-const TIMER_IN_SECONDS = 3599;
+const TIMER_IN_SECONDS = 60;
 
 document.getElementById("backBtn").onclick = () => {
   window.location.href = "/";
@@ -125,6 +124,7 @@ const createNewLine = (data) => {
 };
 
 const toggleTurn = async () => {
+  resetTimer();
   await fetchChangeTurn();
 };
 
@@ -154,17 +154,20 @@ socket.on("startGame", () => {
 });
 
 socket.on("hitTheWord", (data) => {
-  if (data.gameId === game.gameId) toggleTurn();
-});
-
-socket.on("changeTurn", (data) => {
-  if (data.gameId === game.gameId) toggleTurn();
+  if (data.gameId === game.gameId) {
+    resetTimer();
+    toggleTurn();
+  }
 });
 
 socket.on("endGame", (data) => {
   if (data.gameId === game.gameId) {
-    console.log("endGame", data);
-    setNonPlaying();
+    const winnerTeam = data?.winnerTeam || {};
+    drawEndGame(winnerTeam.teamName, data?.isTie);
+    setGameDetails().then(() => {
+      resetTimer();
+      setNonPlaying();
+    });
   }
 });
 
@@ -172,9 +175,39 @@ socket.on("turnChanged", async (data) => {
   if (data.gameId === game.gameId) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     await setGameDetails();
+    resetTimer();
     startTimer();
   }
 });
+
+socket.on("changeTurn", (data) => {
+  if (data.gameId === game.gameId) toggleTurn();
+});
+
+const drawEndGame = (message, isTie = false) => {
+  const finishedGameDiv = document.getElementById("finishedGame");
+  finishedGameDiv.innerHTML = "";
+
+  const messageDiv = document.createElement("div");
+  messageDiv.classList.add(
+    "text-white",
+    "font-bold",
+    "p-4",
+    "rounded-md",
+    "mt-2",
+    "text-center",
+  );
+
+  if (isTie) {
+    messageDiv.classList.add("bg-blue-500");
+    messageDiv.textContent = "It's a draw! Well played!";
+  } else {
+    messageDiv.classList.add("bg-green-500");
+    messageDiv.textContent = `Congratulations ${message}, you won!`;
+  }
+
+  finishedGameDiv.appendChild(messageDiv);
+};
 
 const fetchGameMessages = async (gameId) => {
   const response = await fetch(`/api/chats?gameId=${gameId}&order=1`, {
@@ -229,8 +262,6 @@ const fetchGameDetails = async () => {
 };
 
 const fetchChangeTurn = async () => {
-  // POST /api/games/:gameId/endTurn
-  console.log(`/api/games/${game.gameId}/endTurn`);
   const response = await fetch(`/api/games/${game.gameId}/endTurn`, {
     method: "POST",
     headers: {
@@ -239,7 +270,6 @@ const fetchChangeTurn = async () => {
     },
   });
   const data = await response.json();
-  console.log(data, "fetchChangeTurn");
   return data;
 };
 
@@ -250,14 +280,11 @@ const setDescriberInputs = () => {
 };
 
 const setNonPlaying = () => {
-  isPlaying = false;
   isUserDescribe = false;
-  document.getElementById("messageContainer").remove();
+  document.getElementById("messageContainer")?.remove();
 };
 
 const setPlaying = () => {
-  isPlaying = true;
-
   if (!document.getElementById("messageContainer")) {
     const messageContainer = document.createElement("div");
     messageContainer.id = "messageContainer";
@@ -346,8 +373,8 @@ const setStatus = (statusInfo) => {
 
 const setGameDetails = async () => {
   setNonPlaying();
-  resetTimer();
   const data = await fetchGameDetails();
+  console.log(data, "<<< game details");
   gameDetails = data;
 
   if (!gameDetails) {
@@ -365,6 +392,7 @@ const setGameDetails = async () => {
   if (user.id === data.userIdDescriber) {
     setPlaying();
     setDescriberInputs();
+    showTheWord(data?.currentWord);
     return data;
   }
   isUserDescribe = false;
@@ -398,7 +426,9 @@ const startTimer = () => {
         updateTimerDisplay();
       } else {
         clearInterval(timerInterval);
-        socket.emit("goChangeTurn", { gameId: game.gameId });
+        if (isUserDescribe) {
+          socket.emit("goChangeTurn", { gameId: game.gameId });
+        }
       }
     }, 1000);
   }
@@ -424,12 +454,9 @@ window.onload = () => {
   loadMessages();
   setGameDetails().then((r) => {
     if (r.status === "in progress") {
+      resetTimer();
+      startTimer();
       if (isUserDescribe) showTheWord(r?.currentWord);
     }
-    console.log(gameDetails, "gameDetails");
-    console.log(isUserDescribe, "isUserDescribe");
-    console.log(isPlaying);
-    console.log(game, "game");
-    console.log(user, "user");
   });
 };
