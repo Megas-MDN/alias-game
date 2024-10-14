@@ -30,14 +30,7 @@ const getGameById = async (req, res) => {
   const { gameId } = req.params;
 
   try {
-    // Search the game by its ID and populate the teams and players
-    const game = await Game.findById(gameId).populate({
-      path: "teams",
-      populate: {
-        path: "players", //populate the players of the teams
-        select: "username email", //only return the username and email of the players
-      },
-    });
+    const game = await gameService.getGameById(gameId);
 
     if (!game) {
       return res.status(404).json({ message: "Game not found" });
@@ -52,8 +45,8 @@ const getGameById = async (req, res) => {
 
 const getAllGames = async (req, res) => {
   try {
-    const games = await Game.find().populate("teams");
-    res.json(games);
+    const games = await gameService.getAllGames();
+    return res.status(200).json(games);
   } catch (error) {
     console.error("Error fetching games:", error);
     res.status(500).json({ message: "Error fetching games" });
@@ -63,34 +56,19 @@ const getAllGames = async (req, res) => {
 const deleteGameById = async (req, res) => {
   const { gameId } = req.params;
 
-  try {
-    const deletedGame = await Game.findByIdAndDelete(gameId);
+  const findGameById = await gameService.getSpecificGame(gameId);
 
-    if (!deletedGame) {
-      return res.status(404).json({ message: "Game not found" });
-    }
-
-    return res.status(200).json({ message: "Game deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting game:", error);
-    return res.status(500).json({ error: "Failed to delete game" });
+  if (!findGameById) {
+    return res.status(404).json({ message: "Game Not Found !" });
   }
-};
 
-//new
-const changeGameStatus = async (req, res) => {
-  const { gameId, status } = req.body;
-  try {
-    await gameService.changeGameStatus(gameId, status);
-  } catch (error) {
-    console.error("Error changing game status:", error);
-    return res.status(500).json({ error: "Failed to change game status" });
-  }
+  await gameService.deleteGame(gameId);
+  return res.status(200).json({ message: "Game Deleted with sucess !" });
 };
 
 //Game logic
 
-//join a game - finished
+//join a game
 const joinGame = async (req, res) => {
   const { userId } = req.body;
 
@@ -162,6 +140,7 @@ const joinGame = async (req, res) => {
 
     //Change game status to 'in progress' if both teams have 4 players
     if (teams[0].players.length === 4 && teams[1].players.length === 4) {
+      console.log("Both teams have 4 players. Game in progress");
       game.status = "in progress";
       await game.save();
       io.emit("startGame", game);
@@ -178,20 +157,36 @@ const joinGame = async (req, res) => {
   }
 };
 
-//end turn - finished
+//end turn
 const endTurn = async (req, res) => {
   try {
     const { gameId } = req.params;
-    const game = await gameService.nextTurn(gameId);
+    const result = await gameService.nextTurn(gameId);
 
-    if (game.status === "finished") {
-      io.emit("endGame", { ...game, gameId: game._id });
-      res.json({ message: "Game completed", game });
-    } else {
-      io.emit("turnChanged", { ...game, gameId: game._id });
-      res.json({
+    console.log("Result:", result);
+    if (result.isTie) {
+      io.emit("endGame", result);
+      return res.json({
+        message: "The game ended in a tie.",
+        game: result, // Puedes incluir información adicional aquí
+      });
+    }
+
+    // Verificar si el juego ha terminado con un ganador
+    if (result.winnerTeam) {
+      io.emit("endGame", result);
+      return res.json({
+        message: "Game completed, we have a winner!",
+        winner: result.winnerTeam, // Información del equipo ganador
+      });
+    }
+
+    // Si el juego sigue en progreso, devolver el estado actualizado
+    if (result.status === "in progress") {
+      io.emit("turnChanged", { ...result, gameId: result._id });
+      return res.json({
         message: "Turn ended, next team's turn and describer updated",
-        game,
+        game: result,
       });
     }
   } catch (error) {
@@ -202,48 +197,11 @@ const endTurn = async (req, res) => {
   }
 };
 
-// Fuction to manage the game - IN PROGRESS
-const playGame = async (req, res) => {
-  try {
-    const { gameId } = req.params;
-    //const game = await gameService.verifyGameProgress(gameId);
-
-    const { currentTeamId, currentDescriberId, currentWord } =
-      await gameService.getCurrentTurnInfo(gameId);
-
-    res.status(200).json({
-      message: "Game in progress",
-      currentTeamId,
-      currentDescriberId,
-      currentWord,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error playing game:", error: error.message });
-  }
-};
-
-//new
-const determineWinner = async (req, res) => {
-  const { gameId } = req.params;
-  try {
-    const game = await gameService.determineWinner(gameId);
-    res.json({ message: "Winner determined", game });
-  } catch (error) {
-    console.error("Error determining winner:", error);
-    res.status(500).json({ message: "Error determining winner" });
-  }
-};
-
 module.exports = {
   createGame,
   joinGame,
   getGameById,
   deleteGameById,
   endTurn,
-  playGame,
   getAllGames,
-  changeGameStatus,
-  determineWinner,
 };
