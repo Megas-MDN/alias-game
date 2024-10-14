@@ -3,32 +3,42 @@ const bcrypt = require("bcryptjs");
 const userService = require("../services/userService");
 
 const createUserController = async (req, res) => {
+
     const { username, password } = req.body;
 
-    const existingUser = await userService.findUserByUsername(username);
+    if(username === "" || password === "") {
+        return res.status(401).json({ message: "The fields must have a value !" });
 
-    if (existingUser) {
-        return res.status(401).json({ message: "User already exists" });
+    }else if(typeof(username) !== "string" || typeof(password) !== "string") {
+        return res.status(401).json({ message:"The fileds must be a string !" });
+
+    }else {
+
+        const existingUser = await userService.findUserByUsername(username);
+
+        if (existingUser) {
+            return res.status(401).json({ message: "User already exists" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await userService.createUser({
+            username,
+            password: hashedPassword
+        });
+
+        return res.status(201).json({
+            message: "User registered",
+            user: {
+                username: user.username,
+                gamesPlayed: user.gamesPlayed,
+                gamesWon: user.gamesWon,
+                _id: user._id,
+                __v: user.__v
+            }
+        });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await userService.createUser({
-        username,
-        password: hashedPassword
-    });
-
-    return res.status(201).json({
-        message: "User registered",
-        user: {
-            username: user.username,
-            gamesPlayed: user.gamesPlayed,
-            gamesWon: user.gamesWon,
-            _id: user._id,
-            __v: user.__v
-        }
-    });
-    
 };
 
 const getSpecificUserController = async (req, res) => {

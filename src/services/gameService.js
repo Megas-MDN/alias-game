@@ -1,13 +1,12 @@
-const Game = require('../models/gameModel');
-const Team = require('../models/teamModel');
+const Game = require("../models/gameModel");
+const Team = require("../models/teamModel");
 
-const WordService = require('./wordService');
-const userService = require('./userService');
+const WordService = require("./wordService");
+const userService = require("./userService");
 const TeamService = require("./teamService");
 
 
 const wordService = new WordService();
-
 
 class GameService {
 
@@ -44,66 +43,71 @@ class GameService {
             throw new Error('firstPlayerId is required to create a game');
         }
 
-        try {
-            const team1 = await Team.create({ teamName: 'Team 1', players: [firstPlayerId] });
-            const team2 = await Team.create({ teamName: 'Team 2', players: [] });
-         
-            const game = await Game.create({
-                teams: [team1._id, team2._id],
-                rounds: 3,
-                currentRound: 0,
-                status: 'waiting',
-                currentTurnTeam: team1._id,
-                currentWord: await wordService.generateWord(),
-                currentDescriber: firstPlayerId,
-            });
+    try {
+      const team1 = await Team.create({
+        teamName: "Team 1",
+        players: [firstPlayerId],
+      });
+      const team2 = await Team.create({ teamName: "Team 2", players: [] });
 
-            return game;
-        } catch (error) {
-            console.error('Error creating game:', error);
-            throw new Error('Game creation failed');
-        }
+      const game = await Game.create({
+        teams: [team1._id, team2._id],
+        rounds: 3,
+        currentRound: 0,
+        status: "waiting",
+        currentTurnTeam: team1._id,
+        currentWord: await wordService.generateWord(),
+        currentDescriber: firstPlayerId,
+      });
+
+      return game;
+    } catch (error) {
+      console.error("Error creating game:", error);
+      throw new Error("Game creation failed");
+    }
     }
 
     async verifyGameProgress(gameId) {
-        const game = await Game.findById(gameId);
-        if (!game) {
-            throw new Error('Game not found');
-        }
+    const game = await Game.findById(gameId);
+    if (!game) {
+      throw new Error("Game not found");
+    }
 
-        if (game.status !== 'in progress') {
-            throw new Error('Game is not in progress or already finished');
-        }
+    if (game.status !== "in progress") {
+      throw new Error("Game is not in progress or already finished");
+    }
 
         return game;
     }
 
     async nextTurn(gameId) {
-        const game = await Game.findById(gameId).populate('teams');
-        
+        const game = await Game.findById(gameId).populate("teams");
+
         if (!game) {
-            throw new Error('Game not found');
+        throw new Error("Game not found");
         }
 
-        if (game.status === 'in progress') {
-            const team1 = game.teams[0];
-            const team2 = game.teams[1];
+        if (game.status === "in progress") {
+        const team1 = game.teams[0];
+        const team2 = game.teams[1];
 
-            console.log("Team 1:", team1);
-            console.log("Team 2:", team2);
+        console.log("Team 1:", team1);
+        console.log("Team 2:", team2);
 
-            //Change the turn to the other team
-            if (game.currentTurnTeam.toString() === team1._id.toString()) {
-                game.currentTurnTeam = team2._id;
-                game.describerIndices.team2 = (game.describerIndices.team2 + 1) % team2.players.length;
-                game.currentDescriber = team2.players[game.describerIndices.team2];
-            } else {
-                game.currentTurnTeam = team1._id;
-                game.describerIndices.team1 = (game.describerIndices.team1 + 1) % team1.players.length;
-                game.currentDescriber = team1.players[game.describerIndices.team1];
+        //Change the turn to the other team
+        if (game.currentTurnTeam.toString() === team1._id.toString()) {
+            game.currentTurnTeam = team2._id;
+            game.describerIndices.team2 =
+            (game.describerIndices.team2 + 1) % team2.players.length;
+            game.currentDescriber = team2.players[game.describerIndices.team2];
+        } else {
+            game.currentTurnTeam = team1._id;
+            game.describerIndices.team1 =
+            (game.describerIndices.team1 + 1) % team1.players.length;
+            game.currentDescriber = team1.players[game.describerIndices.team1];
 
-                game.currentRound++;
-            }
+            game.currentRound++;
+        }
 
             // If they played all rounds, the game is completed
             if (game.currentRound === game.rounds) {
@@ -118,9 +122,13 @@ class GameService {
 
                 console.log("Current Team:", currentTeam);
 
-                if (!currentTeam || !currentTeam.players || currentTeam.players.length === 0) {
-                    console.error('Invalid team or no players in the team:', currentTeam);
-                    throw new Error('Current team or its players are invalid');
+                if (
+                !currentTeam ||
+                !currentTeam.players ||
+                currentTeam.players.length === 0
+                ) {
+                console.error("Invalid team or no players in the team:", currentTeam);
+                throw new Error("Current team or its players are invalid");
                 }
 
                 console.log("Players in current team:", currentTeam.players);
@@ -131,15 +139,16 @@ class GameService {
                 await game.save();
                 return game;
             }
-        }else{
-            throw new Error('Game is not in progress or already finished');
+
+        } else {
+        throw new Error("Game is not in progress or already finished");
         }
     }
 
     async getCurrentWord(gameId) {
         const game = await Game.findById(gameId);
         if (!game) {
-            throw new Error('Game not found');
+        throw new Error("Game not found");
         }
         return game.currentWord;
     }
@@ -149,10 +158,10 @@ class GameService {
             const game = await Game.findById(gameId).populate('teams'); 
 
             if (!game) {
-                throw new Error('Game not found');
+                throw new Error("Game not found");
             }
 
-            if(game.status == 'finished'){
+            if (game.status == "finished") {
                 //get the points of each team
                 const pointsTeam1 = game.teams[0].score;
                 const pointsTeam2 = game.teams[1].score;
@@ -193,10 +202,10 @@ class GameService {
         console.log(`Updating user stats for team ${teamId}`);
         const usersInTeam = await TeamService.getUsersByTeamId(teamId); //Get all users in the team
 
-        console.log("Users in team:", usersInTeam); 
+        console.log("Users in team:", usersInTeam);
         for (const user of usersInTeam) {
-            await userService.updateUserStats(user._id); // Update user stats
-            console.log(`User stats updated`);
+        await userService.updateUserStats(user._id); // Update user stats
+        console.log(`User stats updated`);
         }
     }
 
@@ -204,8 +213,8 @@ class GameService {
         console.log(`Updating current game and team for team ${teamId}`);
         const usersInTeam = await TeamService.getUsersByTeamId(teamId); //Get all users in the team
         for (const user of usersInTeam) {
-            await userService.updateUserCurrentGameAndTeam(user._id); // Update user current game and team
-            console.log(`User current game and team updated`);
+        await userService.updateUserCurrentGameAndTeam(user._id); // Update user current game and team
+        console.log(`User current game and team updated`);
         }
     }
 

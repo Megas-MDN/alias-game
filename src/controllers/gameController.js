@@ -2,6 +2,7 @@ const Game = require("../models/gameModel");
 const User = require("../models/userModel");
 
 const gameService = require("../services/gameService");
+const io = require("../services/socketService");
 
 //Game CRUD
 const createGame = async (req, res) => {
@@ -71,8 +72,28 @@ const deleteGameById = async (req, res) => {
 //join a game 
 const joinGame = async (req, res) => {
   const { userId } = req.body;
-  console.log("Body", req.body, "<<< Body");
+
   try {
+    //check if the player is already in another game in progress
+    const allGames = await Game.find({ status: "in progress" }).populate(
+      "teams",
+    );
+    const otherGameInProgress = allGames.find(
+      (game) =>
+        game.status === "in progress" &&
+        game.teams.some((team) => team.players.includes(userId)),
+    );
+
+    if (otherGameInProgress) {
+      return res.status(400).json({
+        message: "Player is already in another game in progress",
+        gameId: otherGameInProgress._id,
+        teamId: otherGameInProgress.teams.find((team) =>
+          team.players.includes(userId),
+        )?._id,
+      });
+    }
+
     // find a game that is waiting for players
     let game = await Game.findOne({ status: "waiting" }).populate("teams");
     if (!game) {
@@ -80,9 +101,10 @@ const joinGame = async (req, res) => {
       game = await gameService.createGame(userId);
 
       return res.status(201).json({
-        message: "You're the first player to join. A new game has been created.",
+        message:
+          "You're the first player to join. A new game has been created.",
         gameId: game._id,
-        teamId: game.teams[0]._id,  
+        teamId: game.teams[0]._id,
       });
     }
 
@@ -100,22 +122,6 @@ const joinGame = async (req, res) => {
         message: "Player is already in a team in this game",
         gameId: game._id,
         teamId: teams.find((team) => team.players.includes(userId))?._id,
-      });
-    }
-
-    //check if the player is already in another game in progress
-    const otherGameInProgress = await Game.findOne({
-      status: "in progress",
-      "teams.players": userId,
-    });
-
-    if (otherGameInProgress) {
-      return res.status(400).json({
-        message: "Player is already in another game in progress",
-        gameId: otherGameInProgress._id,
-        teamId: otherGameInProgress.teams.find((team) =>
-          team.players.includes(userId),
-        )?._id,
       });
     }
 
@@ -138,6 +144,7 @@ const joinGame = async (req, res) => {
       console.log("Both teams have 4 players. Game in progress");
       game.status = "in progress";
       await game.save();
+      io.emit("startGame", game);
     }
 
     return res.status(200).json({

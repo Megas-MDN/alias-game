@@ -4,9 +4,11 @@ const { signToken } = require("../../utils/jwt");
 
 jest.mock("../../models/chatModel");
 jest.mock("../../models/userModel");
+jest.mock("../../services/gameService");
 
 const ChatModel = require("../../models/chatModel");
 const User = require("../../models/userModel");
+const GameService = require("../../services/gameService");
 
 const BASE_PATH = "/api/chats";
 
@@ -90,6 +92,7 @@ describe("Chat messages", () => {
       __v: 0,
     };
 
+    GameService.processGuess.mockResolvedValue(null);
     ChatModel.create.mockResolvedValue(mockChat);
     const response = await supertest(app)
       .post(BASE_PATH)
