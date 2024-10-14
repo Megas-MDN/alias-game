@@ -1,9 +1,6 @@
 const exitBtn = document.getElementById("exitBtn");
 const playerName = document.getElementById("playerName");
 const messagesList = document.getElementById("messages");
-const guessContainer = document.getElementById("guessContainer");
-const messageContainer = document.getElementById("messageContainer");
-const messageInput = document.getElementById("messageInput");
 const guessInput = document.getElementById("guessInput");
 const status = document.getElementById("status");
 const round = document.getElementById("round");
@@ -15,7 +12,7 @@ let game = null;
 let gameDetails = null;
 let isUserDescribe = false;
 let isPlaying = true;
-const TIMER_IN_SECONDS = 600;
+const TIMER_IN_SECONDS = 3599;
 
 document.getElementById("backBtn").onclick = () => {
   window.location.href = "/";
@@ -129,10 +126,6 @@ const createNewLine = (data) => {
 
 const toggleTurn = async () => {
   await fetchChangeTurn();
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  await setGameDetails();
-  resetTimer();
-  startTimer();
 };
 
 const showTheWord = (theWord) => {
@@ -171,12 +164,15 @@ socket.on("changeTurn", (data) => {
 socket.on("endGame", (data) => {
   if (data.gameId === game.gameId) {
     console.log("endGame", data);
+    setNonPlaying();
   }
 });
 
-socket.on("turnChanged", (data) => {
+socket.on("turnChanged", async (data) => {
   if (data.gameId === game.gameId) {
-    console.log("turnChanged", data);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await setGameDetails();
+    startTimer();
   }
 });
 
@@ -249,13 +245,14 @@ const fetchChangeTurn = async () => {
 
 const setDescriberInputs = () => {
   isUserDescribe = true;
-  guessContainer.remove();
-  messageInput.placeholder = "Describe the word";
+  document.getElementById("guessContainer").remove();
+  document.getElementById("messageInput").placeholder = "Describe the word";
 };
 
 const setNonPlaying = () => {
   isPlaying = false;
-  messageContainer.remove();
+  isUserDescribe = false;
+  document.getElementById("messageContainer").remove();
 };
 
 const setPlaying = () => {
@@ -284,7 +281,7 @@ const setPlaying = () => {
 
     const guessContainer = document.createElement("div");
     guessContainer.id = "guessContainer";
-    guessContainer.classList.add("w-2/5", "flex", "space-x-2");
+    guessContainer.classList.add("w-3/5", "flex", "space-x-2");
 
     const guessInput = document.createElement("input");
     guessInput.type = "text";
@@ -348,10 +345,9 @@ const setStatus = (statusInfo) => {
 };
 
 const setGameDetails = async () => {
+  setNonPlaying();
+  resetTimer();
   const data = await fetchGameDetails();
-  console.log("gameDetails", data);
-  console.log("user", user);
-  console.log("game", game);
   gameDetails = data;
 
   if (!gameDetails) {
@@ -428,10 +424,12 @@ window.onload = () => {
   loadMessages();
   setGameDetails().then((r) => {
     if (r.status === "in progress") {
-      startTimer();
       if (isUserDescribe) showTheWord(r?.currentWord);
     }
+    console.log(gameDetails, "gameDetails");
+    console.log(isUserDescribe, "isUserDescribe");
+    console.log(isPlaying);
+    console.log(game, "game");
+    console.log(user, "user");
   });
 };
-
-console.log(isPlaying);
