@@ -234,6 +234,39 @@ class GameService {
     }
     return 0;
   }
+
+  //new
+  async processClue(chatMessage) {
+    const { gameId, message, messageType, userId } = chatMessage;
+  
+    if (messageType === "description") {
+      const game = await this.verifyGameProgress(gameId);
+  
+      // Ensure the user sending the clue is the describer for the current round
+      if (game.currentDescriber.toString() !== userId.toString()) {
+        throw new Error("Only the current describer can send clues.");
+      }
+  
+      // Get the current word and the clue
+      const currentWord = game.currentWord.toLowerCase();
+      const clue = message.toLowerCase();
+
+      let clueArray = clue.split(' ')
+
+      for (let i = 0; i < clueArray.length; i++) {
+        let points = await wordService.checkUserGuess(currentWord,clueArray[i])
+         if (points > 0) {
+           clueArray[i] = "********";
+         }
+        }
+        return clueArray.join(' ');
+  
+      
+    }
+  
+    throw new Error("Invalid message type for processClue");
+  }
+
 }
 
 module.exports = new GameService();
