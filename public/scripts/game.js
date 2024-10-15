@@ -360,6 +360,10 @@ const setPlaying = () => {
         isUserDescribe ? sendMessages("description") : sendMessages("chat");
       }
     });
+
+    guessInput.addEventListener("input", function () {
+      this.value = this.value.replace(/\s/g, "");
+    });
   }
 };
 
