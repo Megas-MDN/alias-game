@@ -18,7 +18,11 @@ const socketSetup = (server) => {
       if (data.gameId && data.teamId && data.userId && data.message) {
         chat = await chatService.createChat(data);
       }
-      io.emit("receiveMessage", { ...chat, ...(data || {}) });
+      io.emit("receiveMessage", {
+        ...chat,
+        ...(data || {}),
+        message: chat?.message || data.message,
+      });
     });
 
     socket.on("goChangeTurn", (data) => {
