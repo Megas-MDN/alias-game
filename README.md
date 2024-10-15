@@ -2,17 +2,18 @@
 
 ## Content
 
-1. [Overview](#description)
+1. [Overview](#overview)
 2. [Game Description](#game-description)
 3. [System Requirements](#System-Requirements)
 4. [Core Modules](#Core-Modules)
 5. [Setup and Installation](#Setup-and-Installation)
-6. [API Documentation](#API-Documentation)
-7. [Database Schema](#Database-Schema)
-8. [Security](#Security)
-9. [Testing](#Testing)
-10. [Deployment](#Deployment)
-11. [Future Enhancements](#Future-Enhancements)
+6. [Base URL](#base-url)
+7. [API Documentation](#API-Documentation)
+8. [Database Schema](#Database-Schema)
+9. [Security](#Security)
+10. [Testing](#Testing)
+11. [Deployment](#Deployment)
+12. [Future Enhancements](#Future-Enhancements)
 
 ---
 
@@ -110,6 +111,8 @@ The game concludes after a predetermined number of rounds, with the highest-scor
    ### Seeding Initial Data
 The database is seeded automatically when the server starts, using the `seedDatabase` function in `index.js`.
 
+## Base URL
+`http://localhost:3000`
 
 
 ## API Documentation
