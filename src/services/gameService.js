@@ -48,13 +48,15 @@ class GameService {
       });
       const team2 = await Team.create({ teamName: "Team 2", players: [] });
 
+      const currentWord = await wordService.generateWord();
+
       const game = await Game.create({
         teams: [team1._id, team2._id],
         rounds: 3,
         currentRound: 0,
         status: "waiting",
         currentTurnTeam: team1._id,
-        currentWord: await wordService.generateWord(),
+        currentWord: currentWord,
         currentDescriber: firstPlayerId,
       });
 
@@ -190,7 +192,7 @@ class GameService {
       }
     } catch (error) {
       console.error("Error determining the winner:", error);
-      throw new Error("Error determining the winner");
+      throw error;
     }
   }
 
@@ -260,8 +262,6 @@ class GameService {
          }
         }
         return clueArray.join(' ');
-  
-      
     }
   
     throw new Error("Invalid message type for processClue");
