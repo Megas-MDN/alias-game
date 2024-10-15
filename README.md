@@ -112,7 +112,7 @@ The game concludes after a predetermined number of rounds, with the highest-scor
 The database is seeded automatically when the server starts, using the `seedDatabase` function in `index.js`.
 
 ## Base URL
-`http://localhost:3000`
+`http://localhost:3001`
 
 
 ## API Documentation
