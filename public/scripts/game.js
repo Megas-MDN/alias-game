@@ -180,9 +180,9 @@ socket.on("turnChanged", async (data) => {
   }
 });
 
-socket.on("changeTurn", (data) => {
-  if (data.gameId === game.gameId) toggleTurn();
-});
+// socket.on("changeTurn", (data) => {
+//   if (isUserDescribe && data.gameId === game.gameId) toggleTurn();
+// });
 
 const drawEndGame = (message, isTie = false) => {
   const finishedGameDiv = document.getElementById("finishedGame");
@@ -427,7 +427,8 @@ const startTimer = () => {
       } else {
         clearInterval(timerInterval);
         if (isUserDescribe) {
-          socket.emit("goChangeTurn", { gameId: game.gameId });
+          // socket.emit("goChangeTurn", { gameId: game.gameId });
+          toggleTurn();
         }
       }
     }, 1000);
