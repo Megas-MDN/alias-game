@@ -37,10 +37,6 @@ const gameSchema = new mongoose.Schema({
         type: String,
         required: true, 
     }, 
-    correctGuesses: {
-        type: Number,
-        default: 0, 
-    },
 }, {
     timestamps: true, 
 });
