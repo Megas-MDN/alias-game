@@ -44,14 +44,6 @@ router.delete("/:chatId", authenticateToken, async (req, res, next) => {
   }
 });
 
-// new 
-router.post('/message', async (req, res, next) => {
-  try {
-    await controller.receiveGuessMessage(req, res);
-  } catch (error) {
-    next(error); // Pass the error to the error-handling middleware
-  }
-});
 
 module.exports = router;
 
