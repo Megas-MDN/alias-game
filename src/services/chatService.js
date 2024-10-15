@@ -49,20 +49,23 @@ const deleteChat = async (chatId) => {
 };
 
 const createChat = async (data = {}) => {
-  const newChat = {
+  
+  let newChat = {
     gameId: data.gameId,
     teamId: data.teamId,
     userId: data.userId,
     message: data.message || "",
     messageType: data.messageType || "guess",
   };
+  
+  newChat.message = await handleDescriptionMessage(data);
   const chat = await ChatModel.create(newChat);
   const points = await handleGuessMessage(data);
   const chatObj = { ...chat._doc, points };
   return chatObj;
 };
 
-//new -
+
 const handleGuessMessage = async (chatMessage) => {
   const { messageType } = chatMessage;
 
@@ -72,11 +75,20 @@ const handleGuessMessage = async (chatMessage) => {
   return 0;
 };
 
+const handleDescriptionMessage = async (chatMessage) => {
+  const { messageType } = chatMessage;
+
+  if (messageType === "description") {
+    return await GameService.processClue(chatMessage);
+  }
+
+  return chatMessage.message;
+};
+
 module.exports = {
   listAllChats,
   getChatById,
   createChat,
   updateChat,
-  deleteChat,
-  handleGuessMessage,
+  deleteChat
 };
