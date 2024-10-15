@@ -324,6 +324,157 @@ paths:
         '403':
           description: Invalid token
 
+  /chats:
+    get:
+      summary: List all chats
+      tags:
+        - Chats
+      responses:
+        '200':
+          description: A list of chats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Create a new chat
+      tags:
+        - Chats
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gameId:
+                  type: string
+                  example: "670ae1e48a25eea8a5b7335c"
+                teamId:
+                  type: string
+                  example: "670ae1e38a25eea8a5b73358"
+                message:
+                  type: string
+                  example: "description of the current word or guess"
+                messageType:
+                  type: string
+                  example: "description or guess"
+      responses:
+        '201':
+          description: Chat created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /chats/{chatId}:
+    get:
+      summary: Get a chat by ID
+      tags:
+        - Chats
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          description: ID of the chat to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A single chat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '404':
+          description: Chat not found
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update a chat by ID
+      tags:
+        - Chats
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          description: ID of the chat to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChat'
+      responses:
+        '200':
+          description: Chat updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Chat not found
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete a chat by ID
+      tags:
+        - Chats
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          description: ID of the chat to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Chat deleted successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Chat not found
+        '500':
+          description: Internal server error
+
+  /chats/message:
+    post:
+      summary: Receive a message guess
+      tags:
+        - Chats
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageGuess'
+      responses:
+        '200':
+          description: Message received successfully
+        '500':
+          description: Internal server error
+
   /games:
     get:
       tags:
@@ -481,8 +632,6 @@ paths:
                     type: string
                   currentWord:
                     type: string
-                  correctGuesses:
-                    type: integer
                   createdAt:
                     type: string
                     format: date-time
@@ -519,7 +668,6 @@ paths:
                 currentTurnTeam: "670ae1e38a25eea8a5b73358"
                 currentDescriber: "670ae0318a25eea8a5b73354"
                 currentWord: "ability"
-                correctGuesses: 0
                 createdAt: "2024-10-12T20:53:56.037Z"
                 updatedAt: "2024-10-12T20:53:56.037Z"
                 __v: 0
@@ -713,9 +861,6 @@ paths:
                       currentWord:
                         type: string
                         example: "clock"
-                      correctGuesses:
-                        type: integer
-                        example: 0
                       _id:
                         type: string
                         example: "670ae4798a25eea8a5b73367"
@@ -831,8 +976,6 @@ paths:
                         type: string
                       currentWord:
                         type: string
-                      correctGuesses:
-                        type: integer
                 example:
                   message: "Turn ended, next team's turn and describer updated"
                   game:
@@ -863,7 +1006,6 @@ paths:
                     currentTurnTeam: "670c0a521c899135ec561908"
                     currentDescriber: "670c0a511c899135ec561900"
                     currentWord: "jump"
-                    correctGuesses: 0
         '200 - Tie':
           description: "The game ended in a tie."
           content:
@@ -1275,6 +1417,120 @@ paths:
       
 
 components:
+  schemas:
+    Chat:
+      type: object
+      properties:
+        gameId:
+          type: string
+          description: The unique identifier of the game (MongoDB ObjectId).
+        teamId:
+          type: string
+          description: The unique identifier of the team (MongoDB ObjectId).
+        userId:
+          type: string
+          description: The unique identifier of the user (MongoDB ObjectId).
+        message:
+          type: string
+          description: The content of the chat message.
+        messageType:
+          type: string
+          enum: 
+            - description
+            - guess
+            - chat
+          description: The type of message (description, guess, chat).
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the message was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date and time when the message was last updated.
+      required:
+        - gameId
+        - teamId
+        - userId
+        - message
+        - messageType
+    Game:
+      type: object
+      properties:
+        teams:
+          type: array
+          items:
+            type: string
+            description: List of team IDs
+        rounds:
+          type: integer
+          description: Number of rounds in the game
+        currentRound:
+          type: integer
+          default: 1
+          description: Current round of the game
+        status:
+          type: string
+          enum: [waiting, in progress, finished]
+          description: Status of the game
+        currentTurnTeam:
+          type: string
+          description: ID of the team currently playing
+        currentDescriber:
+          type: string
+          description: ID of the user currently describing
+        describerIndices:
+          type: object
+          properties:
+            team1:
+              type: integer
+              description: Describer index for team 1
+            team2:
+              type: integer
+              description: Describer index for team 2
+        currentWord:
+          type: string
+          description: The word being guessed
+    Team:
+      type: object
+      properties:
+        teamName:
+          type: string
+          description: The name of the team
+        players:
+          type: array
+          items:
+            type: string
+            description: List of player IDs
+        score:
+          type: integer
+          description: The team's score
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the player
+        password:
+          type: string
+          description: The password of the player
+        gamesPlayed:
+          type: integer
+          description: Number of games played by the user
+        gamesWon:
+          type: integer
+          description: Number of games won by the user
+        currentGame:
+          type: string
+          description: The current game the user is playing
+        team:
+          type: string
+          description: The team the user is a part of
+        role:
+          type: string
+          enum: [player, admin]
+          description: The role of the user (player or admin)
+
   securitySchemes:
     bearerAuth:
       type: http
